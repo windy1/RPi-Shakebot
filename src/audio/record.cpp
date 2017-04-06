@@ -5,6 +5,8 @@
 
 using namespace std;
 
+// Reference: http://www.portaudio.com/docs/v19-doxydocs/paex__record_8c_source.html
+
 namespace sb {
 
     static RecordCallback *callback = nullptr;
@@ -23,11 +25,6 @@ namespace sb {
 
     void printErr(PaError err);
 
-    /*
-     * Credit due to the example files included with the PortAudio library (paex_record.c).
-     * http://www.portaudio.com/docs/v19-doxydocs/paex__record_8c.html
-     */
-
     bool startRecording(RecordCallback cback) {
         // initialize buffer
         cout << "startRecording()" << endl;
@@ -39,6 +36,7 @@ namespace sb {
         int numSamples = numFrames * NUM_CHANNELS;
         unsigned int numBytes = numSamples * sizeof(Sample);
 
+        cout << "sample size = " << sizeof(Sample) << endl;
         cout << "numFrames = " << numFrames << endl;
         cout << "numSamples = " << numSamples << endl;
         cout << "numBytes = " << numBytes << endl;
@@ -75,7 +73,7 @@ namespace sb {
             goto done;
         }
         inputParams.channelCount = NUM_CHANNELS;
-        inputParams.sampleFormat = paFloat32;
+        inputParams.sampleFormat = SAMPLE_FORMAT;
         inputParams.suggestedLatency = Pa_GetDeviceInfo(inputParams.device)->defaultLowInputLatency;
         inputParams.hostApiSpecificStreamInfo = NULL;
 
@@ -148,7 +146,10 @@ namespace sb {
     int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                        const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
-        cout << "recordCallback()" << endl;
+        (void) outputBuffer;
+        (void) timeInfo;
+        (void) statusFlags;
+
         AudioData *data = (AudioData*) userData;
         const Sample *in = (const Sample*) inputBuffer;
         Sample *buffer = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
@@ -184,6 +185,10 @@ namespace sb {
     int playCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                      const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                      void *userData) {
+        (void) inputBuffer;
+        (void) timeInfo;
+        (void) statusFlags;
+
         AudioData *data = (AudioData*) userData;
         Sample *out = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
         Sample *buffer = (Sample*) outputBuffer;
@@ -239,7 +244,7 @@ namespace sb {
             goto done;
         }
         outputParams.channelCount = NUM_CHANNELS;
-        outputParams.sampleFormat = paFloat32;
+        outputParams.sampleFormat = SAMPLE_FORMAT;
         outputParams.suggestedLatency = Pa_GetDeviceInfo(outputParams.device)->defaultLowOutputLatency;
         outputParams.hostApiSpecificStreamInfo = NULL;
 

@@ -78,7 +78,7 @@ namespace sb {
     void onRecordFinish(AudioData* data) {
         cout << "record finished" << endl;
         //playAudio(*data);
-        encodeFlac((*data), "test.flac");
+        encodeFlac(*data, "test.flac");
         finished = true;
     }
 

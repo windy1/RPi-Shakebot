@@ -8,8 +8,9 @@
 #define SAMPLE_RATE         44100
 #define FRAMES_PER_BUFFER   512
 #define SAMPLE_SILENCE      0
+#define SAMPLE_FORMAT       paInt16
 
-typedef float Sample;
+typedef uint16_t Sample;
 
 namespace sb {
 
