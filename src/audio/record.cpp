@@ -3,12 +3,6 @@
 #include <cassert>
 #include "record.h"
 
-#define MAX_SECONDS         (5)
-#define NUM_CHANNELS        (2)
-#define SAMPLE_RATE         (44100)
-#define FRAMES_PER_BUFFER   (512)
-#define SAMPLE_SILENCE      (0)
-
 using namespace std;
 
 namespace sb {
@@ -65,6 +59,7 @@ namespace sb {
             goto done;
         }
 
+        // make sure stream is not active
         if (Pa_IsStreamActive(stream) > 0) {
             cout << "Error: Stream is active" << endl;
             success = false;
@@ -84,6 +79,7 @@ namespace sb {
         inputParams.suggestedLatency = Pa_GetDeviceInfo(inputParams.device)->defaultLowInputLatency;
         inputParams.hostApiSpecificStreamInfo = NULL;
 
+        // open stream
         err = Pa_OpenStream(
                 &stream,
                 &inputParams,
@@ -97,18 +93,21 @@ namespace sb {
             goto done;
         }
 
+        // set callback
         callback = cback;
         err = Pa_SetStreamFinishedCallback(stream, onStreamFinished);
         if (err != paNoError) {
             goto done;
         }
 
+        // start recording
         err = Pa_StartStream(stream);
         if (err != paNoError) {
             goto done;
         }
 
         done:
+        // cleanup
         if(err != paNoError) {
             cout << "An error occured while using the portaudio stream" << endl;
             cout << "Error number: " << err << endl;
@@ -136,6 +135,9 @@ namespace sb {
         } else {
             AudioData *data = (AudioData*) audioData;
             callback(data);
+            if (data->recordedSamples) {
+                free(data->recordedSamples);
+            }
         }
     }
 

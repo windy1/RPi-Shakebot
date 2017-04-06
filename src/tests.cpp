@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "Shakebot.h"
 #include "audio/record.h"
+#include "audio/flac.h"
 #include <iostream>
 #include <fstream>
 #include <festival/festival.h>
@@ -76,12 +77,13 @@ namespace sb {
 
     void onRecordFinish(AudioData* data) {
         cout << "record finished" << endl;
-        playAudio(*data);
+        //playAudio(*data);
+        encodeFlac((*data), "test.flac");
         finished = true;
     }
 
     int testPortAudio() {
-        cout << "start" << endl;
+        cout << "starting recording" << endl;
         sb::startRecording(onRecordFinish);
         //sb::startRecording(onRecordFinish);
         while (!finished);

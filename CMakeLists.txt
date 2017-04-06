@@ -40,6 +40,7 @@ target_link_libraries(shakespeare
         ncurses
         portaudio
         FLAC++
+        FLAC
         /usr/local/opt/festival/src/lib/libFestival.a
         /usr/local/opt/speech_tools/lib/libestools.a
         /usr/local/opt/speech_tools/lib/libeststring.a
