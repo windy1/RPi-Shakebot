@@ -2,14 +2,13 @@
 #include "graphics/Graphics.h"
 #include "Shakebot.h"
 #include "tests.h"
-#include "audio/voice.h"
+#include "audio/speech.h"
 #include <fstream>
 #include <festival/festival.h>
 
 sb::Graphics *graphics = new sb::Graphics();
 sb::Shakebot *bot = new sb::Shakebot();
 bool running = true;
-thread voiceThread;
 
 int main(int argv, char *argc[]) {
     if (argv > 1 && string(argc[1]) == "--test") {
@@ -20,15 +19,14 @@ int main(int argv, char *argc[]) {
         return failed;
     }
     graphics->init();
-    voiceThread = sb::startVoiceThread();
+    sb::startSpeech();
     while (running) {
         graphics->clear();
         graphics->pollInput();
         bot->update();
         graphics->push();
     }
-    sb::stopVoiceThread();
-    voiceThread.join();
+    sb::stopSpeech();
     return 0;
 }
 

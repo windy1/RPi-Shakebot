@@ -32,8 +32,8 @@ namespace sb {
 
         bool voxStarted = false;
         bool joinVox = false;
-        promise<void> voxPromise;
-        future<void> voxFuture;
+        promise<bool> voxPromise;
+        future<bool> voxFuture;
 
     public:
 

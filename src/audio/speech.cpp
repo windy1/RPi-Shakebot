@@ -1,4 +1,4 @@
-#include "voice.h"
+#include "speech.h"
 #include <queue>
 #include <festival/festival.h>
 #include "json.hpp"
@@ -12,40 +12,47 @@ using json = nlohmann::json;
 
 namespace sb {
 
+    static thread th;
     static bool running = false;
-    static queue<Phrase> toSay;
+    static queue<Phrase> phraseQueue;
     static string *responseBody;
 
     static int writer(char *data, size_t size, size_t nmemb, std::string *buffer_in);
 
-    void run() {
+    // the main method for the speech thread
+    static void speech() {
         running = true;
         festival_initialize(true, 210000);
         while (running) {
-            if (!toSay.empty()) {
-                Phrase phrase = toSay.front();
-                toSay.pop();
+            if (!phraseQueue.empty()) {
+                // take next phrase and play it
+                Phrase phrase = phraseQueue.front();
+                phraseQueue.pop();
+                bool success = true;
                 if (!festival_say_text(phrase.str.data())) {
                     cout << "Error: Could not say text" << endl;
+                    success = false;
                 }
-                phrase.pr.set_value();
+                phrase.pr.set_value(success);
             }
         }
+        festival_tidy_up();
     }
 
-    thread startVoiceThread() {
-        return thread(run);
+    void startSpeech() {
+        th = thread(speech);
     }
 
-    void stopVoiceThread() {
+    void stopSpeech() {
         running = false;
+        th.join();
     }
 
-    void toVoice(const string str, promise<void> &pr) {
-        toSay.push({pr, str});
+    void pushSpeech(const string str, promise<bool> &pr) {
+        phraseQueue.push({pr, str});
     }
 
-    string toText(const AudioData &data) {
+    string speech2text(const AudioData &data) {
         // build request body
         unsigned int numSamples = (unsigned int) (data.maxFrameIndex * NUM_CHANNELS);
         vector<uint8_t> buffer(numSamples);
@@ -68,6 +75,8 @@ namespace sb {
         cout << "sending request..." << endl;
         CURL *curl;
         CURLcode response;
+
+        // construct headers
         struct curl_slist *headers = NULL;
         string len = "Content-Length: " + to_string(body.size());
         cout << len.c_str() << endl;
@@ -76,8 +85,10 @@ namespace sb {
         curl_slist_append(headers, len.c_str());
         curl_slist_append(headers, "Authorization: Bearer ya29.El8rBAvlJa0Hc5cK_vzou-gjTl3-9b40QtekEphhReOVM-lj1o00Rcq5BhgM2BSDtIwFfIsJO12VHkdnjbjJSnOvDNJ7U1GOeqZUIyaGm6JOHz6rGEBg0lLeGJKuZ7NTig");
         curl_slist_append(headers, "charsets: utf-8");
+
         curl = curl_easy_init();
         if (curl) {
+            // request properties
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_easy_setopt(curl, CURLOPT_URL, SPEECH_API_URL);
@@ -85,6 +96,7 @@ namespace sb {
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.dump().c_str());
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
+            // send request
             response = curl_easy_perform(curl);
             if (response == CURLE_OK) {
                 char *ct;

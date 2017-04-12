@@ -11,7 +11,7 @@ using namespace std;
 namespace sb {
 
     struct Phrase {
-        promise<void> &pr;
+        promise<bool> &pr;
         string str;
     };
 
@@ -20,12 +20,14 @@ namespace sb {
      *
      * @return Voice thread
      */
-    thread startVoiceThread();
+    void startSpeech();
 
     /**
      * Stops the voice thread.
      */
-    void stopVoiceThread();
+    void stopSpeech();
+
+    void joinSpeech();
 
     /**
      * Pushes a new phrase to be executed on the next iteration of the loop.
@@ -33,9 +35,9 @@ namespace sb {
      * @param str phrase to execute
      * @param pr  promise to be completed once the phrase has been executed
      */
-    void toVoice(const string str, promise<void> &pr);
+    void pushSpeech(const string str, promise<bool> &pr);
 
-    string toText(const AudioData &data);
+    string speech2text(const AudioData &data);
 
 }
 

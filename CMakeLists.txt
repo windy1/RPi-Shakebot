@@ -13,7 +13,7 @@ set(SOURCE_FILES
         src/graphics/RenderShakebot.cpp src/graphics/RenderShakebot.h
         src/Shakebot.cpp src/Shakebot.h
         src/tests.cpp src/tests.h
-        src/audio/voice.cpp src/audio/voice.h
+        src/audio/speech.cpp src/audio/speech.h
         src/audio/record.cpp src/audio/record.h
         src/audio/flac.cpp src/audio/flac.h
         src/audio/base64.cpp src/audio/base64.h)

@@ -33,7 +33,7 @@ namespace sb {
      *
      * @param data Data to play
      */
-    void playAudio(AudioData &data);
+    bool playAudio(AudioData &data);
 
     /**
      * Starts recording from the default input device.

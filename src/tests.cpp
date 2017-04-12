@@ -2,7 +2,7 @@
 #include "Shakebot.h"
 #include "audio/record.h"
 #include "audio/flac.h"
-#include "audio/voice.h"
+#include "audio/speech.h"
 #include "audio/base64.h"
 #include <iostream>
 #include <fstream>
@@ -156,7 +156,7 @@ namespace sb {
         encodeFlac(*data, "test/test.flac");
         //testEncode8(*data);
         //testEncode16(*data);
-        toText(*data);
+        speech2text(*data);
         recordFinished = true;
     }
 

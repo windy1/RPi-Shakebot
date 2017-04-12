@@ -2,7 +2,7 @@
 #include <regex>
 #include <iostream>
 #include <festival/festival.h>
-#include "audio/voice.h"
+#include "audio/speech.h"
 
 const regex syllableRegex("[aeiouy]+");
 
@@ -23,8 +23,8 @@ namespace sb {
             if (currentWord.empty()) {
                 if (firstWord) {
                     if (!voxStarted) {
-                        voxPromise = promise<void>();
-                        sb::toVoice(phraseBuffer, voxPromise);
+                        voxPromise = promise<bool>();
+                        sb::pushSpeech(phraseBuffer, voxPromise);
                         voxFuture = voxPromise.get_future();
                         delayClock.restart();
                         voxStarted = true;

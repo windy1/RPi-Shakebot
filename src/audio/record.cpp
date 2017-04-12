@@ -27,7 +27,6 @@ namespace sb {
 
     bool startRecording(RecordCallback *cback) {
         // initialize buffer
-        cout << "startRecording()" << endl;
         PaError err = paNoError;
         bool success = true;
         AudioData data;
@@ -107,32 +106,34 @@ namespace sb {
         done:
         // cleanup
         if(err != paNoError) {
-            cout << "An error occurred while using the portaudio stream" << endl;
-            cout << "Error number: " << err << endl;
-            cout << "Error message: " << Pa_GetErrorText(err) << endl;
+            printErr(err);
             success = false;
         }
         if (!success) {
+            // terminate stream if active
             if (Pa_IsStreamActive(stream)) {
                 Pa_CloseStream(stream);
             }
+            // free sample memory
             if(data.recordedSamples) {
                 free(data.recordedSamples);
             }
+            // terminate port audio
             Pa_Terminate();
         }
         return success;
     }
 
     void onStreamFinished(void *audioData) {
-        cout << "stream finished, closing stream" << endl;
-        assert(callback != nullptr);
+        // close stream and pass callback recorded data
+        assert(callback != NULL);
         PaError err = Pa_CloseStream(stream);
         if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
             printErr(err);
         } else {
             AudioData *data = (AudioData*) audioData;
             callback(data);
+            // free sample memory
             if (data->recordedSamples) {
                 free(data->recordedSamples);
             }
@@ -140,19 +141,23 @@ namespace sb {
     }
 
     bool stopRecording() {
+        // TODO
         return false;
     }
 
     int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                        const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
+        // unused
         (void) outputBuffer;
         (void) timeInfo;
         (void) statusFlags;
 
+        // write new frames to data
         AudioData *data = (AudioData*) userData;
         const Sample *in = (const Sample*) inputBuffer;
-        Sample *buffer = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
+        // sampleData starting at current frame
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
         long frames;
         int finished;
         unsigned long framesLeft = (unsigned long) (data->maxFrameIndex - data->frameIndex);
@@ -164,17 +169,18 @@ namespace sb {
             finished = paContinue;
         }
         if (inputBuffer == NULL) {
+            // no new data
             for (long i = 0; i < frames; i++) {
-                *buffer++ = SAMPLE_SILENCE;
+                *sampleData++ = SAMPLE_SILENCE;
                 if (NUM_CHANNELS == 2) {
-                    *buffer++ = SAMPLE_SILENCE;
+                    *sampleData++ = SAMPLE_SILENCE;
                 }
             }
         } else {
             for (long i = 0; i < frames; i++) {
-                *buffer++ = *in++;
+                *sampleData++ = *in++;
                 if (NUM_CHANNELS == 2) {
-                    *buffer++ = *in++;
+                    *sampleData++ = *in++;
                 }
             }
         }
@@ -185,36 +191,38 @@ namespace sb {
     int playCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                      const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                      void *userData) {
+        // unused
         (void) inputBuffer;
         (void) timeInfo;
         (void) statusFlags;
 
+        // write data to output device
         AudioData *data = (AudioData*) userData;
-        Sample *out = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
-        Sample *buffer = (Sample*) outputBuffer;
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
+        Sample *out = (Sample*) outputBuffer;
         int finished;
         unsigned int framesLeft = (unsigned int) (data->maxFrameIndex - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             int i = 0;
             for (i = 0; i < framesLeft; i++) {
-                *buffer++ = *out++;
+                *out++ = *sampleData++;
                 if (NUM_CHANNELS == 2) {
-                    *buffer++ = *out++;
+                    *out++ = *sampleData++;
                 }
             }
             for (; i < framesPerBuffer; i++) {
-                *buffer++ = 0;
+                *out++ = 0;
                 if (NUM_CHANNELS == 2) {
-                    *buffer++ = 0;
+                    *out++ = 0;
                 }
             }
             data->frameIndex += framesLeft;
             finished = paComplete;
         } else {
             for (int i = 0; i < framesPerBuffer; i++) {
-                *buffer++ = *out++;
+                *out++ = *sampleData++;
                 if (NUM_CHANNELS == 2) {
-                    *buffer++ = *out++;
+                    *out++ = *sampleData++;
                 }
             }
             data->frameIndex += framesPerBuffer;
@@ -229,7 +237,8 @@ namespace sb {
         cout << "Error message: " << Pa_GetErrorText(err) << endl;
     }
 
-    void playAudio(AudioData &data) {
+    bool playAudio(AudioData &data) {
+        bool success = true;
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             goto done;
@@ -241,6 +250,7 @@ namespace sb {
         outputParams.device = Pa_GetDefaultOutputDevice();
         if (outputParams.device == paNoDevice) {
             cout << "Error: No default output device." << endl;
+            success = false;
             goto done;
         }
         outputParams.channelCount = NUM_CHANNELS;
@@ -266,8 +276,9 @@ namespace sb {
             if (err != paNoError) {
                 goto done;
             }
-            cout << "Playing back" << endl;
+            cout << "Playing back..." << endl;
 
+            // blocking
             while (Pa_IsStreamActive(stream) == 1) {
                 Pa_Sleep(100);
             }
@@ -276,14 +287,16 @@ namespace sb {
             if (err != paNoError) {
                 goto done;
             }
-            cout << "Done" << endl;
+            cout << "Done." << endl;
         }
 
         done:
-        Pa_Terminate();
         if (err != paNoError) {
             printErr(err);
+            success = false;
         }
+        Pa_Terminate();
+        return success;
     }
 
 }
