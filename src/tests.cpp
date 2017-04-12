@@ -104,8 +104,8 @@ namespace sb {
     }
 
     void testEncode16(const AudioData &data) {
-        // FIXME: Google does not seem to like this even though the data can
-        // be encoded and decoded properly
+        // Note: Google does not seem to like this even though the data can
+        // be encoded and decoded properly on this end
         // test 16-bit sample base64 encode and decode
         unsigned int numSamples = (unsigned int) (data.maxFrameIndex * NUM_CHANNELS);
         unsigned int numBytes = numSamples * 2;
@@ -154,8 +154,9 @@ namespace sb {
         cout << "record finished" << endl;
         playAudio(*data);
         encodeFlac(*data, "test/test.flac");
-        testEncode8(*data);
+        //testEncode8(*data);
         //testEncode16(*data);
+        toText(*data);
         recordFinished = true;
     }
 

@@ -35,6 +35,8 @@ namespace sb {
      */
     void toVoice(const string str, promise<void> &pr);
 
+    string toText(const AudioData &data);
+
 }
 
 #endif //SHAKESPEARE_VOICE_H

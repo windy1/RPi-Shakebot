@@ -10,6 +10,9 @@
 #define SAMPLE_SILENCE      0
 #define SAMPLE_FORMAT       /*paInt16*/ paInt8
 
+#define ENCODING            "LINEAR16"
+#define LANGUAGE_CODE       "en-US"
+
 typedef /*uint16_t*/ uint8_t Sample;
 
 namespace sb {

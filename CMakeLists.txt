@@ -35,8 +35,6 @@ link_directories(/usr/local/lib)
 include_directories(/usr/local/Cellar/flac/1.3.2/include)
 link_directories(/usr/local/Cellar/flac/1.3.2/lib)
 
-include_directories(/usr/local/include/b64)
-
 target_link_libraries(shakespeare
         ${SFML_LIBRARIES}
         ${OPENGL_LIBRARIES}
@@ -45,7 +43,7 @@ target_link_libraries(shakespeare
         portaudio
         FLAC++
         FLAC
-        b64
+        curl
         /usr/local/opt/festival/src/lib/libFestival.a
         /usr/local/opt/speech_tools/lib/libestools.a
         /usr/local/opt/speech_tools/lib/libeststring.a
