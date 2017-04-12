@@ -8,7 +8,7 @@ const regex syllableRegex("[aeiouy]+");
 
 namespace sb {
 
-    void Shakebot::say(string phrase) {
+    void Shakebot::say(const string phrase) {
         phraseBuffer = phrase;
     }
 
@@ -24,7 +24,7 @@ namespace sb {
                 if (firstWord) {
                     if (!voxStarted) {
                         voxPromise = promise<void>();
-                        sb::vox::push(phraseBuffer, voxPromise);
+                        sb::toVoice(phraseBuffer, voxPromise);
                         voxFuture = voxPromise.get_future();
                         delayClock.restart();
                         voxStarted = true;
@@ -66,7 +66,7 @@ namespace sb {
         }
     }
 
-    int countSyllables(string phrase, unsigned int n) {
+    int countSyllables(const string phrase, unsigned int n) {
         if (phrase.empty()) {
             return n;
         }

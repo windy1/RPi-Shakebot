@@ -12,6 +12,9 @@ namespace sb {
     const string        WINDOW_TITLE("Shakebot 1.0");
     const sf::VideoMode VIDEO_MODE(440 * 2, 564 * 2);
 
+    /**
+     * Handles graphics within the application.
+     */
     class Graphics {
 
         sf::RenderWindow window;

@@ -10,6 +10,9 @@ using namespace std;
 
 namespace sb {
 
+    /**
+     * Represents the main "bot" or "avatar" the interacts with the end user.
+     */
     class Shakebot {
 
         friend class RenderShakebot;
@@ -34,8 +37,16 @@ namespace sb {
 
     public:
 
-        void say(string phrase);
+        /**
+         * Prompts the bot to say the specified phrase.
+         *
+         * @param phrase Phrase to say
+         */
+        void say(const string phrase);
 
+        /**
+         * Updates the bot. To be called once every application cycle.
+         */
         void update();
 
     };
@@ -46,7 +57,7 @@ namespace sb {
      * @param phrase phrase to count syllables of
      * @return amount of syllables in the phrase
      */
-    int countSyllables(string phrase);
+    int countSyllables(const string phrase);
 
 }
 

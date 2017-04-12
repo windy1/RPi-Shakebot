@@ -7,6 +7,13 @@
 
 namespace sb {
 
+    /**
+     * Encodes the specified AudioData to a FLAC file with the specified name.
+     *
+     * @param data AudioData to encode
+     * @param fileName File name to encode to
+     * @return True if successful
+     */
     bool encodeFlac(const AudioData &data, const char *fileName);
 
 }

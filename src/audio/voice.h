@@ -4,10 +4,11 @@
 #include <thread>
 #include <string>
 #include <future>
+#include "record.h"
 
 using namespace std;
 
-namespace sb { namespace vox {
+namespace sb {
 
     struct Phrase {
         promise<void> &pr;
@@ -19,12 +20,12 @@ namespace sb { namespace vox {
      *
      * @return Voice thread
      */
-    thread start();
+    thread startVoiceThread();
 
     /**
      * Stops the voice thread.
      */
-    void stop();
+    void stopVoiceThread();
 
     /**
      * Pushes a new phrase to be executed on the next iteration of the loop.
@@ -32,8 +33,8 @@ namespace sb { namespace vox {
      * @param str phrase to execute
      * @param pr  promise to be completed once the phrase has been executed
      */
-    void push(string str, promise<void> &pr);
+    void toVoice(const string str, promise<void> &pr);
 
-}}
+}
 
 #endif //SHAKESPEARE_VOICE_H

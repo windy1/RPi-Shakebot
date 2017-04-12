@@ -2,6 +2,8 @@
 #include "Shakebot.h"
 #include "audio/record.h"
 #include "audio/flac.h"
+#include "audio/voice.h"
+#include "audio/base64.h"
 #include <iostream>
 #include <fstream>
 #include <festival/festival.h>
@@ -73,21 +75,94 @@ namespace sb {
         return failed;
     }
 
-    bool finished = false;
+    void testEncode8(const AudioData &data) {
+        // test 8-bit sample base64 encode and decode
+        unsigned int numSamples = (unsigned int) (data.maxFrameIndex * NUM_CHANNELS);
+        vector<uint8_t> buffer(numSamples);
+        for (int i = 0; i < numSamples; i++) {
+            buffer[i] = data.recordedSamples[i];
+        }
+
+        string encoded = base64_encode((const unsigned char*) &buffer[0], numSamples);
+        ofstream file("tests/testEncode8.txt");
+        if (file) {
+            file << encoded << endl;
+        }
+        file.flush();
+        file.close();
+
+        // playback decoded data
+        const char *decoded = base64_decode(encoded).data();
+        AudioData newData;
+        newData.frameIndex = 0;
+        newData.maxFrameIndex = data.maxFrameIndex;
+        newData.recordedSamples = (Sample*) malloc(numSamples);
+        for (int i = 0; i < numSamples; i++) {
+            newData.recordedSamples[i] = (uint8_t) decoded[i];
+        }
+        playAudio(newData);
+    }
+
+    void testEncode16(const AudioData &data) {
+        // FIXME: Google does not seem to like this even though the data can
+        // be encoded and decoded properly
+        // test 16-bit sample base64 encode and decode
+        unsigned int numSamples = (unsigned int) (data.maxFrameIndex * NUM_CHANNELS);
+        unsigned int numBytes = numSamples * 2;
+
+        // split each 16-bit int into two 8-bit ints
+        vector<uint8_t> buffer(numBytes);
+        int sampleIndex = 0;
+        for (int i = 0; i < numBytes; i += 2) {
+            buffer[i] = (uint8_t) (data.recordedSamples[sampleIndex] >> 0x8);   // high
+            buffer[i + 1] = (uint8_t) data.recordedSamples[sampleIndex];        // low
+            sampleIndex++;
+        }
+
+        // encode bytes to base64
+        string encoded = base64_encode((const unsigned char*) &buffer[0], numBytes);
+        ofstream file("tests/testEncode16.txt");
+        if (file) {
+            file << encoded << endl;
+        }
+        file.flush();
+        file.close();
+
+        // decode base64
+        string decoded = base64_decode(encoded);
+        AudioData newData;
+        newData.frameIndex = 0;
+        newData.maxFrameIndex = data.maxFrameIndex;
+        newData.recordedSamples = (Sample*) malloc(numBytes);
+        if (newData.recordedSamples == NULL) {
+            cout << "Error: Could not allocate memory for samples." << endl;
+            return;
+        }
+
+        // reconstruct 16-bit data and playback
+        sampleIndex = 0;
+        for (int i = 0; i < numBytes; i += 2) {
+            newData.recordedSamples[sampleIndex] = ((uint8_t) decoded[i] << 0x8) + (uint8_t) decoded[i + 1];
+            sampleIndex++;
+        }
+        playAudio(newData);
+    }
+
+    bool recordFinished = false;
 
     void onRecordFinish(AudioData* data) {
         cout << "record finished" << endl;
-        //playAudio(*data);
-        encodeFlac(*data, "test.flac");
-        finished = true;
+        playAudio(*data);
+        encodeFlac(*data, "test/test.flac");
+        testEncode8(*data);
+        //testEncode16(*data);
+        recordFinished = true;
     }
 
     int testPortAudio() {
         cout << "starting recording" << endl;
         sb::startRecording(onRecordFinish);
-        //sb::startRecording(onRecordFinish);
-        while (!finished);
-        //record();
+        while (!recordFinished);
         return 0;
     }
 

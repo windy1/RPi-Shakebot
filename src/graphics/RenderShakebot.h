@@ -10,6 +10,9 @@ namespace sb {
 
     class Shakebot;
 
+    /**
+     * Represents the "render" of the main bot.
+     */
     class RenderShakebot {
 
         sb::Shakebot *bot;
@@ -26,6 +29,11 @@ namespace sb {
 
         RenderShakebot(sb::Shakebot *bot, string textureFile, sf::IntRect mouthRect);
 
+        /**
+         * Draws this component to the specified window.
+         *
+         * @param window Window to draw to
+         */
         void draw(sf::RenderWindow *window);
 
     };

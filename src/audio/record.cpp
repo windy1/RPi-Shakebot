@@ -25,7 +25,7 @@ namespace sb {
 
     void printErr(PaError err);
 
-    bool startRecording(RecordCallback cback) {
+    bool startRecording(RecordCallback *cback) {
         // initialize buffer
         cout << "startRecording()" << endl;
         PaError err = paNoError;
@@ -107,7 +107,7 @@ namespace sb {
         done:
         // cleanup
         if(err != paNoError) {
-            cout << "An error occured while using the portaudio stream" << endl;
+            cout << "An error occurred while using the portaudio stream" << endl;
             cout << "Error number: " << err << endl;
             cout << "Error message: " << Pa_GetErrorText(err) << endl;
             success = false;

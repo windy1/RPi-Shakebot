@@ -1,18 +1,22 @@
 #include "voice.h"
 #include <queue>
 #include <festival/festival.h>
+#include <cassert>
+#include "base64.h"
 
-namespace sb { namespace vox {
+using namespace std;
+
+namespace sb {
 
     bool running = false;
-    queue<sb::vox::Phrase> toSay;
+    queue<Phrase> toSay;
 
     void run() {
         running = true;
         festival_initialize(true, 210000);
         while (running) {
             if (!toSay.empty()) {
-                sb::vox::Phrase phrase = toSay.front();
+                Phrase phrase = toSay.front();
                 toSay.pop();
                 if (!festival_say_text(phrase.str.data())) {
                     cout << "Error: Could not say text" << endl;
@@ -22,16 +26,16 @@ namespace sb { namespace vox {
         }
     }
 
-    thread start() {
+    thread startVoiceThread() {
         return thread(run);
     }
 
-    void stop() {
+    void stopVoiceThread() {
         running = false;
     }
 
-    void push(string str, promise<void> &pr) {
+    void toVoice(const string str, promise<void> &pr) {
         toSay.push({pr, str});
     }
 
-}}
+}

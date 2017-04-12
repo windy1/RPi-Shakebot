@@ -20,14 +20,14 @@ int main(int argv, char *argc[]) {
         return failed;
     }
     graphics->init();
-    voiceThread = sb::vox::start();
+    voiceThread = sb::startVoiceThread();
     while (running) {
         graphics->clear();
         graphics->pollInput();
         bot->update();
         graphics->push();
     }
-    sb::vox::stop();
+    sb::stopVoiceThread();
     voiceThread.join();
     return 0;
 }
