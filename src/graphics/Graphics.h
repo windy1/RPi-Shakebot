@@ -9,9 +9,6 @@ using namespace std;
 
 namespace sb {
 
-    const string        WINDOW_TITLE("Shakebot 1.0");
-    const sf::VideoMode VIDEO_MODE(440 * 2, 564 * 2);
-
     /**
      * Handles graphics within the application.
      */
@@ -23,6 +20,9 @@ namespace sb {
         sb::RenderShakebot *sbRender;
 
     public:
+
+        static const string        WINDOW_TITLE;
+        static const sf::VideoMode VIDEO_MODE;
 
         /**
          * Initializes the graphics instance and opens the window.

@@ -2,29 +2,9 @@
 #define SHAKESPEARE_RECORD_H
 
 #include <portaudio.h>
-
-#define MAX_SECONDS         5
-#define NUM_CHANNELS        2
-#define SAMPLE_RATE         44100
-#define FRAMES_PER_BUFFER   512
-#define SAMPLE_SILENCE      0
-#define SAMPLE_FORMAT       /*paInt16*/ paInt8
-
-#define ENCODING            "LINEAR16"
-#define LANGUAGE_CODE       "en-US"
-
-typedef /*uint16_t*/ uint8_t Sample;
+#include "audio.h"
 
 namespace sb {
-
-    /**
-     * Represents, raw, recorded, PCM, audio data.
-     */
-    struct AudioData {
-        int     frameIndex;
-        int     maxFrameIndex;
-        Sample *recordedSamples;
-    };
 
     typedef void RecordCallback(AudioData*);
 

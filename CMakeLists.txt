@@ -16,7 +16,7 @@ set(SOURCE_FILES
         src/audio/speech.cpp src/audio/speech.h
         src/audio/record.cpp src/audio/record.h
         src/audio/flac.cpp src/audio/flac.h
-        src/audio/base64.cpp src/audio/base64.h)
+        src/audio/base64.cpp src/audio/base64.h src/audio/speech_api.cpp src/audio/speech_api.cpp src/audio/speech_api.h src/audio/audio.h)
 add_executable(shakespeare ${SOURCE_FILES})
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")

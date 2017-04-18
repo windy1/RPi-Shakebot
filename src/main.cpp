@@ -6,8 +6,8 @@
 #include <fstream>
 #include <festival/festival.h>
 
-sb::Graphics *graphics = new sb::Graphics();
-sb::Shakebot *bot = new sb::Shakebot();
+sb::Graphics graphics;
+sb::Shakebot bot;
 bool running = true;
 
 int main(int argv, char *argc[]) {
@@ -18,20 +18,20 @@ int main(int argv, char *argc[]) {
         failed += sb::testPortAudio();
         return failed;
     }
-    graphics->init();
+    graphics.init();
     sb::startSpeech();
     while (running) {
-        graphics->clear();
-        graphics->pollInput();
-        bot->update();
-        graphics->push();
+        graphics.clear();
+        graphics.pollInput();
+        bot.update();
+        graphics.push();
     }
     sb::stopSpeech();
     return 0;
 }
 
 sb::Shakebot* sb::getBot() {
-    return bot;
+    return &bot;
 }
 
 bool sb::isRunning() {

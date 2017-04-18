@@ -5,6 +5,9 @@
 
 namespace sb {
 
+    const string Graphics::WINDOW_TITLE("Shakebot 1.0");
+    const sf::VideoMode Graphics::VIDEO_MODE(440 * 2, 564 * 2);
+
     void Graphics::init() {
         sbRender = new sb::RenderShakebot(sb::getBot(), "images/shakespeare.jpg", sf::IntRect(166, 243, 54, 65));
         window.create(VIDEO_MODE, WINDOW_TITLE);

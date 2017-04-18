@@ -27,8 +27,6 @@ namespace sb {
      */
     void stopSpeech();
 
-    void joinSpeech();
-
     /**
      * Pushes a new phrase to be executed on the next iteration of the loop.
      *
@@ -36,8 +34,6 @@ namespace sb {
      * @param pr  promise to be completed once the phrase has been executed
      */
     void pushSpeech(const string str, promise<bool> &pr);
-
-    string speech2text(const AudioData &data);
 
 }
 

@@ -3,12 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "../Shakebot.h"
 
 using namespace std;
 
 namespace sb {
-
-    class Shakebot;
 
     /**
      * Represents the "render" of the main bot.

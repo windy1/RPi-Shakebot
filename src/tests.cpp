@@ -4,6 +4,7 @@
 #include "audio/flac.h"
 #include "audio/speech.h"
 #include "audio/base64.h"
+#include "audio/speech_api.h"
 #include <iostream>
 #include <fstream>
 #include <festival/festival.h>
@@ -152,8 +153,8 @@ namespace sb {
 
     void onRecordFinish(AudioData* data) {
         cout << "record finished" << endl;
-        playAudio(*data);
-        encodeFlac(*data, "test/test.flac");
+        //playAudio(*data);
+        //encodeFlac(*data, "test/test.flac");
         //testEncode8(*data);
         //testEncode16(*data);
         speech2text(*data);

@@ -3,7 +3,7 @@
 
 #include "FLAC++/metadata.h"
 #include "FLAC++/encoder.h"
-#include "record.h"
+#include "audio.h"
 
 namespace sb {
 
