@@ -4,12 +4,13 @@
 
 using namespace std;
 
+// Reference: http://www.cstr.ed.ac.uk/projects/festival/manual/festival_28.html#SEC132
+
 namespace sb {
 
     static thread th;
     static bool running = false;
     static queue<Phrase> phraseQueue;
-    static string *responseBody;
 
     static void speech() {
         // the main method for the speech thread

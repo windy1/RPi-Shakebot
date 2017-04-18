@@ -1,7 +1,6 @@
 #include "Graphics.h"
 #include "../app.h"
 #include <iostream>
-#include "../Shakebot.h"
 
 namespace sb {
 

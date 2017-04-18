@@ -5,7 +5,6 @@
 #include "audio/speech.h"
 #include "audio/base64.h"
 #include "audio/speech_api.h"
-#include <iostream>
 #include <fstream>
 #include <festival/festival.h>
 

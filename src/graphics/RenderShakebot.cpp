@@ -1,5 +1,4 @@
 #include "RenderShakebot.h"
-#include "../Shakebot.h"
 #include <iostream>
 
 namespace sb {

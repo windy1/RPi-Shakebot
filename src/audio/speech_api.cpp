@@ -4,11 +4,13 @@
 
 #define SPEECH_API_URL "https://speech.googleapis.com/v1beta1/speech:syncrecognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
 
+// Reference: https://curl.haxx.se/libcurl/c/
+
 namespace sb {
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp);
 
-    static json REQUEST_BODY = {
+    static const json REQUEST_BODY = {
         {"config", {
             {"encoding", ENCODING},
             {"sampleRate", SAMPLE_RATE},

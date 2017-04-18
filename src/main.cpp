@@ -1,10 +1,7 @@
 #include "app.h"
 #include "graphics/Graphics.h"
-#include "Shakebot.h"
 #include "tests.h"
 #include "audio/speech.h"
-#include <fstream>
-#include <festival/festival.h>
 
 sb::Graphics graphics;
 sb::Shakebot bot;

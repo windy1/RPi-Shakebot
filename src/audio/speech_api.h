@@ -10,6 +10,13 @@ using namespace std;
 
 namespace sb {
 
+    /**
+     * Performs a synchronous request to Google Speech API with the specified
+     * AudioData to be translated to text.
+     *
+     * @param data Data to send to Google
+     * @return JSON response from Google
+     */
     json speech2text(const AudioData &data);
 
 }

@@ -1,7 +1,5 @@
 #include "Shakebot.h"
 #include <regex>
-#include <iostream>
-#include <festival/festival.h>
 #include "audio/speech.h"
 
 const regex syllableRegex("[aeiouy]+");
