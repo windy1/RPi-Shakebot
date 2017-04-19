@@ -1,3 +1,4 @@
+#include <iostream>
 #include "app.h"
 #include "graphics/Graphics.h"
 #include "tests.h"
@@ -9,12 +10,14 @@ bool running = true;
 
 int main(int argv, char *argc[]) {
     if (argv > 1 && string(argc[1]) == "--test") {
+        cout << "Running tests..." << endl;
         int failed = 0;
         //failed += sb::testCountSyllables();
         //failed += sb::testFestival();
         failed += sb::testPortAudio();
         return failed;
     }
+    cout << "Starting..." << endl;
     graphics.init();
     sb::startSpeech();
     while (running) {

@@ -26,61 +26,94 @@ namespace sb {
         size_t size;
     };
 
-    json speech2text(const AudioData &data) {
+    bool speech2text(const AudioData *data, json &result) {
         // this implementation will work for single-byte samples only
         assert(sizeof(Sample) == 1);
 
-        Response response;
+        bool                success         = true;
+        CURL                *curl           = 0;
+        curl_slist          *requestHeaders = NULL;
+        json                requestBody;
+        const char          *requestBodyRaw;
+        CURLcode            responseCode;
+        Response            response;
+        size_t              numSamples      = (size_t) (data->maxFrameIndex * NUM_CHANNELS);
+        size_t              numBytes        = numSamples * sizeof(Sample);
+        char                *buffer         = (char*) malloc(numBytes);
+        string              encodedAudio;
+
+        // allocate space for response
         response.data = (char*) malloc(1);
         response.size = 0;
         if (response.data == NULL) {
             cout << "Error: Could not allocate memory for response" << endl;
-            return {};
+            success = false;
+            goto cleanup;
         }
 
-        // build request body
-        unsigned int numSamples = (unsigned int) (data.maxFrameIndex * NUM_CHANNELS);
-        vector<uint8_t> buffer(numSamples);
-        for (int i = 0; i < numSamples; i++) {
-            buffer[i] = data.recordedSamples[i];
-        }
-        string encoded = base64_encode((const unsigned char*) &buffer[0], numSamples);
-        json body = REQUEST_BODY;
-        body["audio"]["content"] = encoded;
-        const char *bodyData = body.dump().c_str();
+        // copy sample data
+        memcpy(buffer, data->recordedSamples, numBytes);
+
+        // encode data
+        encodedAudio = base64_encode((const unsigned char*) buffer, (unsigned int) numBytes);
+        requestBody = REQUEST_BODY;
+        requestBody["audio"]["content"] = encodedAudio;
+        requestBodyRaw = requestBody.dump().c_str();
 
         // construct headers
-        struct curl_slist *headers = NULL;
-        string len = "Content-Length: " + to_string(strlen(bodyData));
-        headers = curl_slist_append(headers, "Accept: application/json");
-        headers = curl_slist_append(headers, "Content-Type: application/json");
-        headers = curl_slist_append(headers, len.c_str());
-        headers = curl_slist_append(headers, "charsets: utf-8");
+        requestHeaders = curl_slist_append(requestHeaders, "Accept: application/json");
+        requestHeaders = curl_slist_append(requestHeaders, "Content-Type: application/json");
+        requestHeaders = curl_slist_append(requestHeaders,
+                ("Content-Length: " + to_string(strlen(requestBodyRaw))).c_str());
+        requestHeaders = curl_slist_append(requestHeaders, "charsets: utf-8");
 
         // initialize curl
-        CURL *curl;
-        CURLcode responseCode;
         curl = curl_easy_init();
         if (curl) {
             // request properties
             curl_easy_setopt(curl, CURLOPT_URL, SPEECH_API_URL);
             curl_easy_setopt(curl, CURLOPT_POST, true);
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, bodyData);
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, requestHeaders);
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, requestBodyRaw);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponse);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
             curl_easy_setopt(curl, CURLOPT_VERBOSE, true);
+
             // send request
             responseCode = curl_easy_perform(curl);
             if (responseCode == CURLE_OK) {
-                char *ct;
-                responseCode = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &ct);
-                if (responseCode == CURLE_OK && ct) {
-                    return json::parse(response.data);
+                char *contentType;
+                responseCode = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
+                if (responseCode == CURLE_OK && string(contentType) == "application/json; charset=UTF-8") {
+                    result = json::parse(response.data);
+                    goto cleanup;
+                } else {
+                    cout << "Error: Invalid content type: " << contentType << endl;
+                    success = false;
+                    goto cleanup;
                 }
+            } else {
+                cout << "Error: cURL responded with error (code " << responseCode << ")" << endl;
+                success = false;
+                goto cleanup;
             }
+        } else {
+            cout << "Error: Could not initialize cURL" << endl;
+            success = false;
+            goto cleanup;
         }
-        return {};
+
+        cleanup:
+        if (curl) {
+            curl_easy_cleanup(curl);
+        }
+        if (response.data) {
+            free(response.data);
+        }
+        if (buffer) {
+            free(buffer);
+        }
+        return success;
     }
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {

@@ -17,7 +17,7 @@ namespace sb {
      * @param data Data to send to Google
      * @return JSON response from Google
      */
-    json speech2text(const AudioData &data);
+    bool speech2text(const AudioData *data, json &result);
 
 }
 

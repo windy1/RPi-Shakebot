@@ -1,5 +1,6 @@
 #include "Shakebot.h"
 #include <regex>
+#include <iostream>
 #include "audio/speech.h"
 
 const regex syllableRegex("[aeiouy]+");
@@ -13,7 +14,9 @@ namespace sb {
     void Shakebot::update() {
         if (joinVox) {
             if (voxFuture.valid()) {
-                voxFuture.get();
+                if (!voxFuture.get()) {
+                    cout << "Error: Could not say last phrase." << endl;
+                }
             }
             joinVox = false;
         }

@@ -6,7 +6,7 @@
 
 namespace sb {
 
-    typedef void RecordCallback(AudioData*);
+    typedef void RecordCallback(const AudioData*);
 
     /**
      * Plays the specified AudioData to the default output device.
@@ -14,6 +14,13 @@ namespace sb {
      * @param data Data to play
      */
     bool playAudio(AudioData &data);
+
+    /**
+     * Returns true if audio is currently being recorded.
+     *
+     * @return True if recording
+     */
+    bool isActive();
 
     /**
      * Starts recording from the default input device.
@@ -25,10 +32,8 @@ namespace sb {
 
     /**
      * Stops recording audio.
-     *
-     * @return True if successful
      */
-    bool stopRecording();
+    void stopRecording();
 
 }
 

@@ -10,11 +10,14 @@ namespace sb {
     void Graphics::init() {
         sbRender = new sb::RenderShakebot(sb::getBot(), "images/shakespeare.jpg", sf::IntRect(166, 243, 54, 65));
         window.create(VIDEO_MODE, WINDOW_TITLE);
+        window.setKeyRepeatEnabled(false);
     }
 
     void Graphics::clear() {
         window.clear(sf::Color::Black);
     }
+
+    static bool recording = false;
 
     void Graphics::pollInput() {
         sf::Event event;
@@ -30,9 +33,29 @@ namespace sb {
                             getline(cin, nextPhrase);
                             cout << nextPhrase << endl;
                             clock.restart();
+                            break;
+                        case sf::Keyboard::Return:
+                            if (!recording) {
+                                cout << "recording" << endl;
+                                recording = true;
+                            }
+                            break;
                         default:
                             break;
                     }
+                    break;
+                case sf::Event::KeyReleased:
+                    switch (event.key.code) {
+                        case sf::Keyboard::Return:
+                            if (recording) {
+                                cout << "done recording" << endl;
+                                recording = false;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 default:
                     break;
             }
