@@ -11,6 +11,7 @@ bool running = true;
 int main(int argc, char *argv[]) {
     vector<string> args(argv, argv + argc);
     sf::Vector2f scale(1, 1);
+    sf::Vector2f offset(0, 0);
     for (int i = 0; i < args.size(); i++) {
         if (args[i] == "--test") {
             cout << "Running tests..." << endl;
@@ -23,11 +24,14 @@ int main(int argc, char *argv[]) {
             graphics.setFullScreen(true);
         } else if (args[i] == "--scale") {
             scale = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
+        } else if (args[i] == "--move") {
+            offset = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
         }
     }
     cout << "Starting..." << endl;
     graphics.init();
     graphics.getBotRender()->scale(scale);
+    graphics.getBotRender()->move(offset);
     sb::startSpeech();
     while (running) {
         graphics.clear();

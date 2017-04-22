@@ -31,6 +31,8 @@ namespace sb {
 
         void scale(sf::Vector2f scale);
 
+        void move(sf::Vector2f v);
+
         /**
          * Draws this component to the specified window.
          *

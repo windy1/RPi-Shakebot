@@ -26,6 +26,13 @@ namespace sb {
         restingMouthPos = sf::Vector2f(restingMouthPos.x * scale.x, restingMouthPos.y * scale.y);
     }
 
+    void RenderShakebot::move(sf::Vector2f v) {
+        baseSprite.move(v);
+        mouthSprite.move(v);
+        mouthHole.move(v);
+        restingMouthPos = sf::Vector2f(restingMouthPos.x + v.x, restingMouthPos.y + v.y);
+    }
+
     void RenderShakebot::draw(sf::RenderWindow *window) {
         if (bot->isMouthOpened) {
             mouthSprite.setPosition(restingMouthPos + sf::Vector2f(0, openMouthYOff));
