@@ -30,6 +30,10 @@ include_directories(${SFML_INCLUDE_DIR})
 
 include_directories(/usr/local/opt/speech_tools/include)
 
+if(NOT APPLE)
+    target_link_libraries(shakespeare pthread asound estools eststring estbase)
+endif()
+
 target_link_libraries(shakespeare
         ${SFML_LIBRARIES}
         ${OPENGL_LIBRARIES}
@@ -39,11 +43,6 @@ target_link_libraries(shakespeare
         FLAC
         curl
         Festival
-        pthread
-        asound
-        estools
-        eststring
-        estbase
         /usr/local/opt/speech_tools/lib/libestools.a
         /usr/local/opt/speech_tools/lib/libeststring.a
         /usr/local/opt/speech_tools/lib/libestbase.a)
