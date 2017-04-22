@@ -33,6 +33,9 @@ link_libraries(/usr/local/opt/speech_tools/lib)
 if(APPLE)
     include_directories(/usr/local/opt/festival/src/include/festival.h)
     link_directories(/usr/local/opt/festival/src/lib)
+else()
+    include_directories(/usr/local/opt/portaudio/include)
+    link_directories(/usr/local/opt/portaudio/lib)
 endif()
 
 target_link_libraries(shakespeare
