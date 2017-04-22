@@ -43,7 +43,7 @@ target_link_libraries(shakespeare
         FLAC++
         FLAC
         curl
-        /usr/local/opt/festival/src/lib/libFestival.a
+        Festival
         /usr/local/opt/speech_tools/lib/libestools.a
         /usr/local/opt/speech_tools/lib/libeststring.a
         /usr/local/opt/speech_tools/lib/libestbase.a)
