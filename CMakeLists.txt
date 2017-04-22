@@ -23,7 +23,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR}  ${GLUT_INCLUDE_DIRS})
-
 find_package(SFML REQUIRED system window graphics audio)
 include_directories(${SFML_INCLUDE_DIR})
 
@@ -36,6 +35,8 @@ if(APPLE)
 else()
     include_directories(/usr/local/opt/portaudio/include)
     link_directories(/usr/local/opt/portaudio/lib)
+    include_directories(/usr/local/opt/curl-7.54.0/include)
+    link_directories(/usr/local/opt/curl-7.54.0/lib)
 endif()
 
 target_link_libraries(shakespeare
