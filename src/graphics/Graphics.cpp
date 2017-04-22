@@ -74,6 +74,10 @@ namespace sb {
         sb::setRunning(window.isOpen());
     }
 
+    sb::RenderShakebot* Graphics::getBotRender() const {
+        return sbRender;
+    }
+
     void Graphics::setFullScreen(bool fullScreen) {
         this->fullScreen = fullScreen;
         if (fullScreen) {

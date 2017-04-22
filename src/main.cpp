@@ -8,18 +8,26 @@ sb::Graphics graphics;
 sb::Shakebot bot;
 bool running = true;
 
-int main(int argv, char *argc[]) {
-    if (argv > 1 && string(argc[1]) == "--test") {
-        cout << "Running tests..." << endl;
-        int failed = 0;
-        //failed += sb::testCountSyllables();
-        //failed += sb::testFestival();
-        failed += sb::testPortAudio();
-        return failed;
+int main(int argc, char *argv[]) {
+    vector<string> args(argv, argv + argc);
+    sf::Vector2f scale(1, 1);
+    for (int i = 0; i < args.size(); i++) {
+        if (args[i] == "--test") {
+            cout << "Running tests..." << endl;
+            int failed = 0;
+            //failed += sb::testCountSyllables();
+            //failed += sb::testFestival();
+            failed += sb::testPortAudio();
+            return failed;
+        } else if (args[i] == "--fullscreen") {
+            graphics.setFullScreen(true);
+        } else if (args[i] == "--scale") {
+            scale = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
+        }
     }
-    graphics.setFullScreen(string(argc[1]) == "--fullscreen");
     cout << "Starting..." << endl;
     graphics.init();
+    graphics.getBotRender()->scale(scale);
     sb::startSpeech();
     while (running) {
         graphics.clear();

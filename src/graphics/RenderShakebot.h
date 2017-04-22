@@ -22,11 +22,14 @@ namespace sb {
         sf::Sprite mouthSprite;
         sf::RectangleShape mouthHole;
         sf::Vector2f restingMouthPos;
-        float openMouthYOff = 35;
+        float openMouthYOff = 20;
 
     public:
 
-        RenderShakebot(sb::Shakebot *bot, string textureFile, sf::IntRect mouthRect);
+        RenderShakebot(sb::Shakebot *bot, string textureFile,
+                       sf::IntRect mouthRect);
+
+        void scale(sf::Vector2f scale);
 
         /**
          * Draws this component to the specified window.

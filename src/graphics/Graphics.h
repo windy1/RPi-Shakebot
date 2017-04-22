@@ -47,6 +47,8 @@ namespace sb {
          */
         void push();
 
+        sb::RenderShakebot* getBotRender() const;
+
         void setFullScreen(bool fullScreen);
 
     };
