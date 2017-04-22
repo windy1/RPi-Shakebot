@@ -29,17 +29,6 @@ find_package(SFML REQUIRED system window graphics audio)
 include_directories(${SFML_INCLUDE_DIR})
 
 include_directories(/usr/local/opt/speech_tools/include)
-link_libraries(/usr/local/opt/speech_tools/lib)
-
-if(APPLE)
-    include_directories(/usr/local/opt/festival/src/include/festival.h)
-    link_directories(/usr/local/opt/festival/src/lib)
-else()
-    include_directories(/usr/local/opt/portaudio/include)
-    link_directories(/usr/local/opt/portaudio/lib)
-    include_directories(/usr/local/opt/curl-7.54.0/include)
-    link_directories(/usr/local/opt/curl-7.54.0/lib)
-endif()
 
 target_link_libraries(shakespeare
         ${SFML_LIBRARIES}
