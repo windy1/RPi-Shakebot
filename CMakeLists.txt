@@ -39,6 +39,11 @@ target_link_libraries(shakespeare
         FLAC
         curl
         Festival
+        pthread
+        asound
+        estools
+        eststring
+        estbase
         /usr/local/opt/speech_tools/lib/libestools.a
         /usr/local/opt/speech_tools/lib/libeststring.a
         /usr/local/opt/speech_tools/lib/libestbase.a)
