@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.6)
 project(shakespeare)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_EXE_LINKER_FLAGS "-framework CoreServices -framework AudioUnit -framework AudioToolbox -framework Carbon")
+if(APPLE)
+    set(CMAKE_EXE_LINKER_FLAGS "-framework CoreServices -framework AudioUnit -framework AudioToolbox -framework Carbon")
+endif()
 
 set(SOURCE_FILES
         src/main.cpp
