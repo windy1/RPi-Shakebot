@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.6)
 project(shakespeare)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-stdlib=libc++")
-set(CMAKE_C_FLAGS "-stdlib=libc++")
 set(CMAKE_EXE_LINKER_FLAGS "-framework CoreServices -framework AudioUnit -framework AudioToolbox -framework Carbon")
 
 set(SOURCE_FILES
@@ -29,9 +27,12 @@ include_directories(${OPENGL_INCLUDE_DIR}  ${GLUT_INCLUDE_DIRS})
 find_package(SFML REQUIRED system window graphics audio)
 include_directories(${SFML_INCLUDE_DIR})
 
+include_directories(/usr/local/opt/speech_tools/include)
+link_libraries(/usr/local/opt/speech_tools/lib)
+
 if(APPLE)
-    include_directories(/usr/local/opt/speech_tools/include /usr/local/opt/festival/src/include/festival.h)
-    link_directories(/usr/local/opt/speech_tools/lib /usr/local/opt/festival/src/lib)
+    include_directories(/usr/local/opt/festival/src/include/festival.h)
+    link_directories(/usr/local/opt/festival/src/lib)
 endif()
 
 target_link_libraries(shakespeare
