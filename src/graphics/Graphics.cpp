@@ -10,6 +10,7 @@ namespace sb {
     void Graphics::init() {
         sbRender = new sb::RenderShakebot(sb::getBot(), "images/shakespeare.jpg", sf::IntRect(166, 243, 54, 65));
         sf::Uint32 style = fullScreen ? sf::Style::Fullscreen : sf::Style::Default;
+        cout << "- Creating window" << endl;
         window.create(videoMode, WINDOW_TITLE, style);
         window.setMouseCursorVisible(false);
         window.setKeyRepeatEnabled(false);

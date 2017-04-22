@@ -15,6 +15,7 @@ namespace sb {
     static void speech() {
         // the main method for the speech thread
         running = true;
+        cout << "- Initializing Festival" << endl;
         festival_initialize(true, 210000);
         while (running) {
             if (!phraseQueue.empty()) {
@@ -29,19 +30,23 @@ namespace sb {
                 phrase.pr.set_value(success);
             }
         }
+        cout << "- Shutting down Festival" << endl;
         festival_tidy_up();
     }
 
     void startSpeech() {
+        cout << "- Starting speech thread" << endl;
         th = thread(speech);
     }
 
     void stopSpeech() {
+        cout << "- Stopping speech thread" << endl;
         running = false;
         th.join();
     }
 
     void pushSpeech(const string str, promise<bool> &pr) {
+        cout << "- Speech queued: \"" << str << "\"" << endl;
         phraseQueue.push({pr, str});
     }
 

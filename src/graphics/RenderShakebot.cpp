@@ -7,6 +7,7 @@ namespace sb {
         bot = b;
         mouthRect = mRect;
         restingMouthPos = sf::Vector2f(mRect.left, mRect.top);
+        cout << "- Loading texture " << textureFile << endl;
         if (!baseTexture.loadFromFile(textureFile) || !mouthTexture.loadFromFile(textureFile, mouthRect)) {
             cerr << "Error: Failed to load texture from file: " << textureFile << endl;
         }

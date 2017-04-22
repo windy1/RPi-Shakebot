@@ -22,10 +22,13 @@ int main(int argc, char *argv[]) {
             return failed;
         } else if (args[i] == "--fullscreen") {
             graphics.setFullScreen(true);
+            cout << "fullscreen=true" << endl;
         } else if (args[i] == "--scale") {
             scale = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
+            cout << "scale=(" << scale.x << "," << scale.y << ")" << endl;
         } else if (args[i] == "--move") {
             offset = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
+            cout << "offset=(" << offset.x << "," << offset.y << ")" << endl;
         }
     }
     cout << "Starting..." << endl;
@@ -33,13 +36,16 @@ int main(int argc, char *argv[]) {
     graphics.getBotRender()->scale(scale);
     graphics.getBotRender()->move(offset);
     sb::startSpeech();
+    cout << "[running]" << endl;
     while (running) {
         graphics.clear();
         graphics.pollInput();
         bot.update();
         graphics.push();
     }
+    cout << "Shutting down..." << endl;
     sb::stopSpeech();
+    cout << "Goodbye." << endl;
     return 0;
 }
 
