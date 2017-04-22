@@ -23,7 +23,7 @@ namespace sb {
                 phraseQueue.pop();
                 bool success = true;
                 if (!festival_say_text(phrase.str.data())) {
-                    cout << "Error: Could not say text" << endl;
+                    cerr << "Error: Could not say text" << endl;
                     success = false;
                 }
                 phrase.pr.set_value(success);

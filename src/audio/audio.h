@@ -5,7 +5,7 @@
 
 #define MAX_SECONDS         5
 #define NUM_CHANNELS        2
-#define SAMPLE_RATE         44100
+#define SAMPLE_RATE         16000
 #define FRAMES_PER_BUFFER   512
 #define SAMPLE_SILENCE      0
 #define SAMPLE_FORMAT       /*paInt16*/ paInt8

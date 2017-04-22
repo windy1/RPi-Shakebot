@@ -15,7 +15,7 @@ namespace sb {
         if (joinVox) {
             if (voxFuture.valid()) {
                 if (!voxFuture.get()) {
-                    cout << "Error: Could not say last phrase." << endl;
+                    cerr << "Error: Could not say last phrase." << endl;
                 }
             }
             joinVox = false;

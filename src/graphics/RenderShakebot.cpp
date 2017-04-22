@@ -8,7 +8,7 @@ namespace sb {
         mouthRect = mRect;
         restingMouthPos = sf::Vector2f(mRect.left * 2, mRect.top * 2);
         if (!baseTexture.loadFromFile(textureFile) || !mouthTexture.loadFromFile(textureFile, mouthRect)) {
-            cout << "Error: Failed to load texture from file: " << textureFile << endl;
+            cerr << "Error: Failed to load texture from file: " << textureFile << endl;
         }
         baseSprite.setTexture(baseTexture);
         baseSprite.scale(2, 2);

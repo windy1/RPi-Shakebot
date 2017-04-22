@@ -34,9 +34,9 @@ namespace sb {
         time_t tm = time(NULL);
         int year = localtime(&tm)->tm_year + 1900;
 
-        cout << "sampleRate = " << sampleRate << endl;
-        cout << "bitsPerSample = " << bitsPerSample << endl;
-        cout << "totalSamples = " << totalSamples << endl;
+        //cout << "sampleRate = " << sampleRate << endl;
+        //cout << "bitsPerSample = " << bitsPerSample << endl;
+        //cout << "totalSamples = " << totalSamples << endl;
 
         // transfer data to int32 buffer
         vector<int32_t> buffer(totalSamples);
@@ -46,7 +46,7 @@ namespace sb {
 
         // allocate encoder
         if ((encoder = FLAC__stream_encoder_new()) == NULL) {
-            cout << "Error: Could not allocate encoder." << endl;
+            cerr << "Error: Could not allocate encoder." << endl;
             success = false;
             goto done;
         }
@@ -59,7 +59,7 @@ namespace sb {
         success &= FLAC__stream_encoder_set_total_samples_estimate(encoder, totalSamples / 2);
 
         if (!success) {
-            cout << "Error: Could not initialize encoder." << endl;
+            cerr << "Error: Could not initialize encoder." << endl;
             goto done;
         }
 
@@ -70,13 +70,13 @@ namespace sb {
             || !FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, false)
             || !FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, "YEAR", to_string(year).data())
             || !FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, false)) {
-            cout << "Error: Could allocate metadata." << endl;
+            cerr << "Error: Could allocate metadata." << endl;
             success = false;
             goto done;
         }
         metadata[0]->length = 1234;
         if (!FLAC__stream_encoder_set_metadata(encoder, metadata, 2)) {
-            cout << "Error: Could not set metadata." << endl;
+            cerr << "Error: Could not set metadata." << endl;
             success = false;
             goto done;
         }
@@ -84,23 +84,23 @@ namespace sb {
         // initialize encoder
         initStatus = FLAC__stream_encoder_init_file(encoder, fileName, progress_callback, NULL);
         if(initStatus != FLAC__STREAM_ENCODER_INIT_STATUS_OK) {
-            cout << "Error: Invalid init status." << endl;
-            cout << "Message: " << FLAC__StreamEncoderInitStatusString[initStatus] << " ";
-            cout << FLAC__stream_encoder_get_resolved_state_string(encoder) << endl;
+            cerr << "Error: Invalid init status." << endl;
+            cerr << "Message: " << FLAC__StreamEncoderInitStatusString[initStatus] << " ";
+            cerr << FLAC__stream_encoder_get_resolved_state_string(encoder) << endl;
             success = false;
             goto done;
         }
 
         // process samples
         if (!FLAC__stream_encoder_process_interleaved(encoder, &buffer[0], totalSamples / 2)) {
-            cout << "Error: Could not process samples." << endl;
+            cerr << "Error: Could not process samples." << endl;
             success = false;
             goto done;
         }
 
         // finish encoding
         if (!FLAC__stream_encoder_finish(encoder)) {
-            cout << "Error: Could not finish encoding.";
+            cerr << "Error: Could not finish encoding.";
             success = false;
             goto done;
         }
@@ -108,8 +108,8 @@ namespace sb {
         // cleanup
         done:
         if (!success) {
-            cout << "State: " << FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)] << endl;
-            cout << "[failed]" << endl;
+            cerr << "State: " << FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)] << endl;
+            cerr << "[failed]" << endl;
         } else {
             cout << "[success]" << endl;
         }

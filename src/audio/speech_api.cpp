@@ -27,9 +27,6 @@ namespace sb {
     };
 
     bool speech2text(const AudioData *data, json &result) {
-        // this implementation will work for single-byte samples only
-        assert(sizeof(Sample) == 1);
-
         bool                success         = true;
         CURL                *curl           = 0;
         curl_slist          *requestHeaders = NULL;
@@ -46,7 +43,7 @@ namespace sb {
         response.data = (char*) malloc(1);
         response.size = 0;
         if (response.data == NULL) {
-            cout << "Error: Could not allocate memory for response" << endl;
+            cerr << "Error: Could not allocate memory for response" << endl;
             success = false;
             goto cleanup;
         }
@@ -88,17 +85,17 @@ namespace sb {
                     result = json::parse(response.data);
                     goto cleanup;
                 } else {
-                    cout << "Error: Invalid content type: " << contentType << endl;
+                    cerr << "Error: Invalid content type: " << contentType << endl;
                     success = false;
                     goto cleanup;
                 }
             } else {
-                cout << "Error: cURL responded with error (code " << responseCode << ")" << endl;
+                cerr << "Error: cURL responded with error (code " << responseCode << ")" << endl;
                 success = false;
                 goto cleanup;
             }
         } else {
-            cout << "Error: Could not initialize cURL" << endl;
+            cerr << "Error: Could not initialize cURL" << endl;
             success = false;
             goto cleanup;
         }
@@ -121,7 +118,7 @@ namespace sb {
         Response *response = (Response*) userp;
         response->data = (char*) realloc(response->data, response->size + realSize + 1);
         if(response->data == NULL) {
-            cout << "Error: Could not reallocate response buffer" << endl;
+            cerr << "Error: Could not reallocate response buffer" << endl;
             return 0;
         }
         memcpy(&(response->data[response->size]), contents, realSize);

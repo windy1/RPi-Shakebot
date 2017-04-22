@@ -3,7 +3,6 @@
 #include "audio/record.h"
 #include "audio/flac.h"
 #include "audio/speech.h"
-#include "audio/base64.h"
 #include "audio/speech_api.h"
 #include <fstream>
 #include <festival/festival.h>
@@ -14,8 +13,6 @@ namespace sb {
 
     static bool recordFinished = false;
 
-    static void testEncode8(const AudioData &data);
-    //static void testEncode16(const AudioData &data);
     static void onRecordFinish(const AudioData* data);
 
     int testCountSyllables() {
@@ -29,7 +26,7 @@ namespace sb {
             cout << "- " << fileName << endl;
             ifstream in(fileName);
             if (!in) {
-                cout << "Error: Failed to open test file: " << fileName << endl;
+                cerr << "Error: Failed to open test file: " << fileName << endl;
                 continue;
             }
             string ln;
@@ -44,7 +41,7 @@ namespace sb {
                 } else {
                     // guessed incorrectly
                     failed++;
-                    cout << "[failed] ";
+                    cerr << "[failed] ";
                 }
                 cout << ln << " : " << result << endl;
                 localTotal++;
@@ -91,7 +88,7 @@ namespace sb {
         int failed = 0;
         if (!sb::startRecording(onRecordFinish)) {
             cout << "- [failed] could not start recording" << endl;
-            failed += 1;
+            failed++;
         }
         while (!recordFinished);
         cout << "Done." << endl;
@@ -100,8 +97,7 @@ namespace sb {
 
     void onRecordFinish(const AudioData *data) {
         cout << "- Finished recording" << endl;
-        AudioData cp = *data;
-        playAudio(cp);
+        playAudio(data);
         //encodeFlac(*data, "test/test.flac");
         json result;
         if (speech2text(data, result)) {

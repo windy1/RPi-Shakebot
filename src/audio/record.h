@@ -13,7 +13,7 @@ namespace sb {
      *
      * @param data Data to play
      */
-    bool playAudio(AudioData &data);
+    bool playAudio(const AudioData *data);
 
     /**
      * Returns true if audio is currently being recorded.

@@ -42,10 +42,10 @@ namespace sb {
         int             numSamples  = numFrames * NUM_CHANNELS;
         unsigned int    numBytes    = numSamples * sizeof(Sample);
 
-        //cout << "sample size = " << sizeof(Sample) << endl;
-        //cout << "numFrames = " << numFrames << endl;
-        //cout << "numSamples = " << numSamples << endl;
-        //cout << "numBytes = " << numBytes << endl;
+        cout << "sample size = " << sizeof(Sample) << endl;
+        cout << "numFrames = " << numFrames << endl;
+        cout << "numSamples = " << numSamples << endl;
+        cout << "numBytes = " << numBytes << endl;
 
         // initialize data buffer
         data.maxFrameIndex = numFrames;
@@ -215,7 +215,8 @@ namespace sb {
         cerr << "Error message: " << Pa_GetErrorText(err) << endl;
     }
 
-    bool playAudio(AudioData &data) {
+    bool playAudio(const AudioData *audioData) {
+        AudioData data = *audioData;
         // note: for testing purposes only
         bool success = true;
         PaError err = Pa_Initialize();
@@ -223,12 +224,12 @@ namespace sb {
             goto done;
         }
 
-        data.frameIndex= 0;
+        data.frameIndex = 0;
 
         PaStreamParameters outputParams;
         outputParams.device = Pa_GetDefaultOutputDevice();
         if (outputParams.device == paNoDevice) {
-            cout << "Error: No default output device." << endl;
+            cerr << "Error: No default output device." << endl;
             success = false;
             goto done;
         }
