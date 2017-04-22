@@ -4,12 +4,13 @@
 
 namespace sb {
 
-    const string Graphics::WINDOW_TITLE("Shakebot 1.0");
-    const sf::VideoMode Graphics::VIDEO_MODE(440 * 2, 564 * 2);
+    const sf::VideoMode Graphics::DEFAULT_VIDEO_MODE    (440 * 2, 564 * 2);
+    const string        Graphics::WINDOW_TITLE          ("Shakebot 1.0");
 
     void Graphics::init() {
         sbRender = new sb::RenderShakebot(sb::getBot(), "images/shakespeare.jpg", sf::IntRect(166, 243, 54, 65));
-        window.create(VIDEO_MODE, WINDOW_TITLE);
+        sf::Uint32 style = fullScreen ? sf::Style::Fullscreen : sf::Style::Default;
+        window.create(videoMode, WINDOW_TITLE, style);
         window.setKeyRepeatEnabled(false);
     }
 
@@ -70,6 +71,15 @@ namespace sb {
         sbRender->draw(&window);
         window.display();
         sb::setRunning(window.isOpen());
+    }
+
+    void Graphics::setFullScreen(bool fullScreen) {
+        this->fullScreen = fullScreen;
+        if (fullScreen) {
+            videoMode = sf::VideoMode::getFullscreenModes()[0];
+        } else {
+            videoMode = DEFAULT_VIDEO_MODE;
+        }
     }
 
 }

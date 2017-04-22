@@ -17,6 +17,7 @@ int main(int argv, char *argc[]) {
         failed += sb::testPortAudio();
         return failed;
     }
+    graphics.setFullScreen(string(argc[1]) == "--fullscreen");
     cout << "Starting..." << endl;
     graphics.init();
     sb::startSpeech();
