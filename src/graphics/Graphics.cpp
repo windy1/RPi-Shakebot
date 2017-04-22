@@ -58,6 +58,9 @@ namespace sb {
                             break;
                     }
                     break;
+                case sf::Event::MouseButtonPressed:
+                    sb::getBot()->say("Hello, world!");
+                    break;
                 default:
                     break;
             }
