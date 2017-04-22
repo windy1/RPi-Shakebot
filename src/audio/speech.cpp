@@ -15,8 +15,8 @@ namespace sb {
     static void speech() {
         // the main method for the speech thread
         running = true;
-        cout << "- Initializing Festival" << endl;
         festival_initialize(true, 210000);
+        cout << "- Speech thread initialized" << endl;
         while (running) {
             if (!phraseQueue.empty()) {
                 // take next phrase and play it
