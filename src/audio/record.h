@@ -33,7 +33,7 @@ namespace sb {
     /**
      * Stops recording audio.
      */
-    void stopRecording();
+    bool stopRecording();
 
 }
 

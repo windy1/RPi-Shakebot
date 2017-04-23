@@ -2,18 +2,19 @@
 #include "base64.h"
 #include <curl/curl.h>
 
-#define SPEECH_API_URL "https://speech.googleapis.com/v1beta1/speech:syncrecognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
+#define SPEECH_API_URL          "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
+#define HEADER_ACCEPT           "Accept: application/json"
+#define HEADER_CONTENT_TYPE     "Content-Type: application/json"
+#define HEADER_CHARSETS         "charsets: utf-8"
 
 // Reference: https://curl.haxx.se/libcurl/c/
 
 namespace sb {
 
-    static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp);
-
     static const json REQUEST_BODY = {
         {"config", {
             {"encoding", ENCODING},
-            {"sampleRate", SAMPLE_RATE},
+            {"sampleRateHertz", SAMPLE_RATE},
             {"languageCode", LANGUAGE_CODE}
         }},
         {"audio", {
@@ -26,9 +27,11 @@ namespace sb {
         size_t size;
     };
 
+    static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp);
+    static bool curlAbort(CURL *curl, Response &response, char *buffer, bool result);
+
     bool speech2text(const AudioData *data, json &result) {
-        bool                success         = true;
-        CURL                *curl           = 0;
+        CURL                *curl           = NULL;
         curl_slist          *requestHeaders = NULL;
         json                requestBody;
         const char          *requestBodyRaw;
@@ -39,13 +42,16 @@ namespace sb {
         char                *buffer         = (char*) malloc(numBytes);
         string              encodedAudio;
 
+        cout << "Sending new Voice API request" << endl;
+        cout << "- Frames: " << data->maxFrameIndex << endl;
+
+
         // allocate space for response
         response.data = (char*) malloc(1);
         response.size = 0;
         if (response.data == NULL) {
-            cerr << "Error: Could not allocate memory for response" << endl;
-            success = false;
-            goto cleanup;
+            cerr << "Could not allocate memory for response" << endl;
+            return curlAbort(curl, response, buffer, false);
         }
 
         // copy sample data
@@ -58,11 +64,11 @@ namespace sb {
         requestBodyRaw = requestBody.dump().c_str();
 
         // construct headers
-        requestHeaders = curl_slist_append(requestHeaders, "Accept: application/json");
-        requestHeaders = curl_slist_append(requestHeaders, "Content-Type: application/json");
-        requestHeaders = curl_slist_append(requestHeaders,
-                ("Content-Length: " + to_string(strlen(requestBodyRaw))).c_str());
-        requestHeaders = curl_slist_append(requestHeaders, "charsets: utf-8");
+        const char *contentLength = ("Content-Length: " + to_string(strlen(requestBodyRaw))).c_str();
+        requestHeaders = curl_slist_append(requestHeaders, HEADER_ACCEPT);
+        requestHeaders = curl_slist_append(requestHeaders, HEADER_CONTENT_TYPE);
+        requestHeaders = curl_slist_append(requestHeaders, contentLength);
+        requestHeaders = curl_slist_append(requestHeaders, HEADER_CHARSETS);
 
         // initialize curl
         curl = curl_easy_init();
@@ -83,24 +89,22 @@ namespace sb {
                 responseCode = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
                 if (responseCode == CURLE_OK && string(contentType) == "application/json; charset=UTF-8") {
                     result = json::parse(response.data);
-                    goto cleanup;
+                    return curlAbort(curl, response, buffer, true);
                 } else {
-                    cerr << "Error: Invalid content type: " << contentType << endl;
-                    success = false;
-                    goto cleanup;
+                    cerr << "Invalid content type: " << contentType << endl;
+                    return curlAbort(curl, response, buffer, false);
                 }
             } else {
-                cerr << "Error: cURL responded with error (code " << responseCode << ")" << endl;
-                success = false;
-                goto cleanup;
+                cerr << "cURL responded with error (code " << responseCode << ")" << endl;
+                return curlAbort(curl, response, buffer, false);
             }
         } else {
-            cerr << "Error: Could not initialize cURL" << endl;
-            success = false;
-            goto cleanup;
+            cerr << "Could not initialize cURL" << endl;
+            return curlAbort(curl, response, buffer, false);
         }
+    }
 
-        cleanup:
+    static bool curlAbort(CURL *curl, Response &response, char *buffer, bool result) {
         if (curl) {
             curl_easy_cleanup(curl);
         }
@@ -110,7 +114,8 @@ namespace sb {
         if (buffer) {
             free(buffer);
         }
-        return success;
+        cout << "cURL Aborted." << endl;
+        return result;
     }
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {

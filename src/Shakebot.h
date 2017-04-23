@@ -5,6 +5,8 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <future>
+#include "audio/speech_api.h"
+#include "graphics/RenderShakebot.h"
 
 using namespace std;
 
@@ -15,7 +17,7 @@ namespace sb {
      */
     class Shakebot {
 
-        friend class RenderShakebot;
+        RenderShakebot render;
 
         string phraseBuffer;
         string currentWord;
@@ -23,7 +25,7 @@ namespace sb {
         int wordUpdates = 0;
         int syllableCount = 0;
         bool firstWord = true;
-        bool isMouthOpened = false;
+        bool mouthOpened = false;
 
         sf::Clock pauseClock;
         sf::Time pauseTime = sf::seconds(0.1);
@@ -37,6 +39,12 @@ namespace sb {
 
     public:
 
+        Shakebot();
+
+        bool isMouthOpened();
+
+        RenderShakebot* getRender();
+
         /**
          * Prompts the bot to say the specified phrase.
          *
@@ -48,6 +56,8 @@ namespace sb {
          * Updates the bot. To be called once every application cycle.
          */
         void update();
+
+        void interpret(const AudioData *data);
 
     };
 

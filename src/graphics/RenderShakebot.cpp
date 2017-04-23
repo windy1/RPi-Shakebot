@@ -1,10 +1,10 @@
 #include "RenderShakebot.h"
-#include <iostream>
+#include "../Shakebot.h"
 
 namespace sb {
 
-    RenderShakebot::RenderShakebot(sb::Shakebot *b, string textureFile, sf::IntRect mRect) {
-        bot = b;
+    RenderShakebot::RenderShakebot(Shakebot *bot, string textureFile, sf::IntRect mRect) {
+        this->bot = bot;
         mouthRect = mRect;
         restingMouthPos = sf::Vector2f(mRect.left, mRect.top);
         cout << "- Loading texture " << textureFile << endl;
@@ -35,7 +35,7 @@ namespace sb {
     }
 
     void RenderShakebot::draw(sf::RenderWindow *window) {
-        if (bot->isMouthOpened) {
+        if (bot->isMouthOpened()) {
             mouthSprite.setPosition(restingMouthPos + sf::Vector2f(0, openMouthYOff));
         } else {
             mouthSprite.setPosition(restingMouthPos);

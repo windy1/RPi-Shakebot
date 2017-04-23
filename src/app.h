@@ -2,6 +2,7 @@
 #define SHAKESPEARE_APP_H
 
 #include "graphics/RenderShakebot.h"
+#include "audio/audio.h"
 
 namespace sb {
 
@@ -25,6 +26,8 @@ namespace sb {
      * @param running False if should stop
      */
     void setRunning(bool running);
+
+    void onRecordFinished(const AudioData *data);
 
 }
 

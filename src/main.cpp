@@ -1,27 +1,23 @@
 #include <iostream>
 #include "app.h"
-#include "graphics/Graphics.h"
 #include "tests.h"
 #include "audio/speech.h"
+#include "Shakebot.h"
+#include "graphics/graphics.h"
 
-sb::Graphics graphics;
 sb::Shakebot bot;
 bool running = true;
 
 int main(int argc, char *argv[]) {
+    // parse arguments
     vector<string> args(argv, argv + argc);
     sf::Vector2f scale(1, 1);
     sf::Vector2f offset(0, 0);
     for (int i = 0; i < args.size(); i++) {
         if (args[i] == "--test") {
-            cout << "Running tests..." << endl;
-            int failed = 0;
-            //failed += sb::testCountSyllables();
-            //failed += sb::testFestival();
-            failed += sb::testPortAudio();
-            return failed;
+            return sb::runTests();
         } else if (args[i] == "--fullscreen") {
-            graphics.setFullScreen(true);
+            sb::setFullScreen(true);
             cout << "fullscreen=true" << endl;
         } else if (args[i] == "--scale") {
             scale = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
@@ -31,32 +27,47 @@ int main(int argc, char *argv[]) {
             cout << "offset=(" << offset.x << "," << offset.y << ")" << endl;
         }
     }
+
+    // initialize
     cout << "Starting..." << endl;
-    graphics.init();
-    graphics.getBotRender()->scale(scale);
-    graphics.getBotRender()->move(offset);
+    sb::initWindow();
+    sb::RenderShakebot *render = bot.getRender();
+    render->scale(scale);
+    render->move(offset);
     sb::startSpeech();
     cout << "[running]" << endl;
+
+    sf::RenderWindow *window = sb::getWindow();
     while (running) {
-        graphics.clear();
-        graphics.pollInput();
+        sb::pollInput();
         bot.update();
-        graphics.push();
+        render->draw(window);
+        sb::display();
     }
+
+    // shutdown
     cout << "Shutting down..." << endl;
     sb::stopSpeech();
     cout << "Goodbye." << endl;
+
     return 0;
 }
 
-sb::Shakebot* sb::getBot() {
-    return &bot;
-}
+namespace sb {
 
-bool sb::isRunning() {
-    return running;
-}
+    Shakebot* getBot() {
+        return &bot;
+    }
 
-void sb::setRunning(bool r) {
-    running = r;
+    bool isRunning() {
+        return running;
+    }
+
+    void setRunning(bool r) {
+        running = r;
+    }
+
+    void onRecordFinished(const AudioData *data) {
+    }
+
 }

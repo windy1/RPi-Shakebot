@@ -3,7 +3,6 @@
 #include "audio/record.h"
 #include "audio/flac.h"
 #include "audio/speech.h"
-#include "audio/speech_api.h"
 #include <fstream>
 #include <festival/festival.h>
 
@@ -12,8 +11,23 @@ using namespace std;
 namespace sb {
 
     static bool recordFinished = false;
-
     static void onRecordFinish(const AudioData* data);
+
+    // Shakebot.h
+    int testCountSyllables();
+    // speech.h
+    int testFestival();
+    // record.h
+    int testPortAudio();
+
+    int runTests() {
+        cout << "Running tests..." << endl;
+        int failed = 0;
+        failed += sb::testCountSyllables();
+        failed += sb::testFestival();
+        failed += sb::testPortAudio();
+        return failed;
+    }
 
     int testCountSyllables() {
         cout << "**** testCountSyllables() ****" << endl;
@@ -84,13 +98,16 @@ namespace sb {
 
     int testPortAudio() {
         cout << "**** testPortAudio() ****" << endl;
+
         cout << "Recording for default time..." << endl;
         int failed = 0;
         if (!sb::startRecording(onRecordFinish)) {
             cout << "- [failed] could not start recording" << endl;
             failed++;
+            recordFinished = true;
         }
         while (!recordFinished);
+
         cout << "Done." << endl;
         return failed;
     }

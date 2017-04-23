@@ -3,18 +3,19 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
-#include "../Shakebot.h"
 
 using namespace std;
 
 namespace sb {
+
+    class Shakebot;
 
     /**
      * Represents the "render" of the main bot.
      */
     class RenderShakebot {
 
-        sb::Shakebot *bot;
+        Shakebot *bot;
         sf::Texture baseTexture;
         sf::Sprite baseSprite;
         sf::Texture mouthTexture;
@@ -26,8 +27,7 @@ namespace sb {
 
     public:
 
-        RenderShakebot(sb::Shakebot *bot, string textureFile,
-                       sf::IntRect mouthRect);
+        RenderShakebot(Shakebot *bot, string textureFile, sf::IntRect mouthRect);
 
         void scale(sf::Vector2f scale);
 

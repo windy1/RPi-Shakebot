@@ -7,6 +7,17 @@ const regex syllableRegex("[aeiouy]+");
 
 namespace sb {
 
+    Shakebot::Shakebot() : render(RenderShakebot(this, "images/shakespeare.jpg", sf::IntRect(166, 243, 54, 65))) {
+    }
+
+    bool Shakebot::isMouthOpened() {
+        return mouthOpened;
+    }
+
+    RenderShakebot* Shakebot::getRender() {
+        return &render;
+    }
+
     void Shakebot::say(const string phrase) {
         phraseBuffer = phrase;
     }
@@ -47,8 +58,8 @@ namespace sb {
                 firstWord = false;
             }
             if (pauseClock.getElapsedTime() >= pauseTime) {
-                isMouthOpened = wordUpdates % 2 == 0;
-                if (!isMouthOpened && ++syllableCount >= wordSyllables) {
+                mouthOpened = wordUpdates % 2 == 0;
+                if (!mouthOpened && ++syllableCount >= wordSyllables) {
                     // word complete
                     currentWord.clear();
                     wordSyllables = 0;
@@ -65,6 +76,10 @@ namespace sb {
                 pauseClock.restart();
             }
         }
+    }
+
+    void Shakebot::interpret(const AudioData *data) {
+
     }
 
     int countSyllables(const string phrase, unsigned int n) {

@@ -8,7 +8,6 @@ endif()
 
 set(SOURCE_FILES
         src/main.cpp
-        src/graphics/Graphics.cpp src/graphics/Graphics.h
         src/app.h
         src/graphics/RenderShakebot.cpp src/graphics/RenderShakebot.h
         src/Shakebot.cpp src/Shakebot.h
@@ -18,7 +17,7 @@ set(SOURCE_FILES
         src/audio/flac.cpp src/audio/flac.h
         src/audio/base64.cpp src/audio/base64.h
         src/audio/speech_api.cpp src/audio/speech_api.h
-        src/audio/audio.h)
+        src/audio/audio.h src/graphics/graphics.cpp src/graphics/graphics.h)
 add_executable(shakespeare ${SOURCE_FILES})
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")
