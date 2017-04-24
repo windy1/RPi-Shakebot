@@ -1,4 +1,7 @@
 *.json
 /cmake-build-debug
+/build
 /.idea
+run
+configure
 .DS_Store

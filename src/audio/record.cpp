@@ -16,7 +16,10 @@ namespace sb {
 
     static int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                               const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
-                              void *userData);
+                              void *userData) {
+        cout << "record callback" << endl;
+        return paContinue;
+    }
 
     static int playCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
@@ -83,6 +86,8 @@ namespace sb {
         cout << "Input Device" << endl;
         cout << "- Device Index: " << inputParams.device << endl;
         cout << "- Suggested Latency: " << inputParams.suggestedLatency << endl;
+
+        cout << "rc = " << recordCallback << endl;
 
         // open stream
         err = Pa_OpenStream(
@@ -161,7 +166,8 @@ namespace sb {
         return true;
     }
 
-    int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+    /*
+    static int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                        const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
         // unused
@@ -218,7 +224,7 @@ namespace sb {
         
         data->frameIndex += frames;
         return finished;
-    }
+    }*/
 
     void printErr(PaError err) {
         cerr << "An error occurred while using the portaudio stream" << endl;

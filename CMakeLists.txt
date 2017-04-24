@@ -30,7 +30,7 @@ include_directories(${SFML_INCLUDE_DIR})
 include_directories(/usr/local/opt/speech_tools/include)
 
 if(NOT APPLE)
-    target_link_libraries(shakespeare pthread asound estools eststring estbase)
+    target_link_libraries(shakespeare rt m jack pthread asound estools eststring estbase)
 endif()
 
 target_link_libraries(shakespeare
