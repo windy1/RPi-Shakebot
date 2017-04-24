@@ -299,7 +299,11 @@ namespace sb {
         cout << "- Frames: " << data.maxFrameIndex << endl;
 
         PaStreamParameters outputParams;
-        outputParams.device = Pa_GetDefaultOutputDevice();
+        if (DEVICE_INDEX == -1) {
+            outputParams.device = Pa_GetDefaultOutputDevice();
+        } else {
+            outputParams.device = DEVICE_INDEX;
+        }
         if (outputParams.device == paNoDevice) {
             cerr << "No default output device" << endl;
             return streamAbort(err, data);
