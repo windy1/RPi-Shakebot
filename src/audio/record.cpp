@@ -37,6 +37,7 @@ namespace sb {
 
     void onStreamFinished(void *audioData) {
         // close stream and pass callback recorded data
+        cout << "Stream complete." << endl;
         assert(callback != NULL);
         assert(audioData != NULL);
         // close and terminate pa
@@ -45,7 +46,6 @@ namespace sb {
             printErr(err);
         } else {
             AudioData data = *(AudioData*) audioData;
-            cout << "Stream complete." << endl;
             callback(&data);
             // free sample memory
             if (data.recordedSamples) {
@@ -58,6 +58,7 @@ namespace sb {
                        const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
         // unused
+        cout << ".";
         (void) outputBuffer;
         (void) timeInfo;
         (void) statusFlags;
@@ -69,7 +70,6 @@ namespace sb {
         long frames;
         int finished;
 
-        cout << ".";
         if (interrupt) {
             // FIXME
             cout << data->frameIndex << endl;
