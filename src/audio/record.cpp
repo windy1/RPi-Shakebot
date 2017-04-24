@@ -165,7 +165,7 @@ namespace sb {
 
         // initialize input device
         PaStreamParameters inputParams;
-        inputParams.device = Pa_GetDefaultInputDevice();
+        inputParams.device = /*Pa_GetDefaultInputDevice()*/ 2;
         if (inputParams.device == paNoDevice) {
             cerr << "No default input device" << endl;
             return streamAbort(err, data);
