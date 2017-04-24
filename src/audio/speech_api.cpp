@@ -62,7 +62,7 @@ namespace sb {
         }
 
         free(buffer);
-        result = response->json();
+        result = response->asJson();
 
         return true;
     }

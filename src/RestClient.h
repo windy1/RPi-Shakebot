@@ -17,7 +17,7 @@ namespace sb {
         CURLcode    code;
         char        *data = NULL;
         size_t      size;
-        json        json();
+        json        asJson();
     };
 
     /**

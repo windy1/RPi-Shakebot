@@ -101,7 +101,7 @@ namespace sb {
         return &response;
     }
 
-    json RestResponse::json() {
+    json RestResponse::asJson() {
         assert(data != NULL);
         return json::parse(data);
     }
