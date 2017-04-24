@@ -160,7 +160,11 @@ namespace sb {
 
         cout << "Available Devices" << endl;
         for (int i = 0; i < Pa_GetDeviceCount(); i++) {
-            cout << "- " << Pa_GetDeviceInfo(i)->name << endl;
+            const PaDeviceInfo *info = Pa_GetDeviceInfo(i);
+            cout << "- " << info->name << endl;
+            cout << "    Max Input Channels: " << info->maxInputChannels << endl;
+            cout << "    Max Output Channels: " << info->maxOutputChannels << endl;
+            cout << "    Default Sample Rate: " << info->defaultSampleRate << endl;
         }
 
         // initialize input device
@@ -176,11 +180,11 @@ namespace sb {
         }
         const PaDeviceInfo *info = Pa_GetDeviceInfo(inputParams.device);
 
-        cout << "Input Device" << endl;
-        cout << "- Device Name: " << info->name << endl;
+        cout << "Using Device" << endl;
+        cout << "- Name: " << info->name << endl;
         cout << "- Max Input Channels: " << info->maxInputChannels << endl;
         cout << "- Max Output Channels: " << info->maxOutputChannels << endl;
-        cout << "- Device Index: " << inputParams.device << endl;
+        cout << "- Index: " << inputParams.device << endl;
 
         inputParams.channelCount = NUM_CHANNELS;
         inputParams.sampleFormat = SAMPLE_FORMAT;
