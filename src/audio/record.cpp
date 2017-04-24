@@ -158,6 +158,11 @@ namespace sb {
             return streamAbort(err, data);
         }
 
+        cout << "Available Devices" << endl;
+        for (int i = 0; i < Pa_GetDeviceCount(); i++) {
+            cout << "- " << Pa_GetDeviceInfo(i)->name << endl;
+        }
+
         // initialize input device
         PaStreamParameters inputParams;
         inputParams.device = Pa_GetDefaultInputDevice();
