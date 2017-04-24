@@ -40,8 +40,10 @@ namespace sb {
         cout << "Stream complete." << endl;
         assert(audioData != NULL);
         // close and terminate pa
+        cout << "closing stream" << endl;
         PaError err = Pa_CloseStream(stream);
         if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
+            cout << "error" << endl;
             printErr(err);
         } else {
             cout << "Executing callback" << endl;
