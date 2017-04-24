@@ -167,10 +167,20 @@ namespace sb {
         }
         inputParams.channelCount = NUM_CHANNELS;
         inputParams.sampleFormat = SAMPLE_FORMAT;
-        inputParams.suggestedLatency = Pa_GetDeviceInfo(inputParams.device)->defaultLowInputLatency;
+        const PaDeviceInfo *info = Pa_GetDeviceInfo(inputParams.device);
+        inputParams.suggestedLatency = info->defaultLowInputLatency;
         inputParams.hostApiSpecificStreamInfo = NULL;
 
+        err = Pa_IsFormatSupported(&inputParams, NULL, SAMPLE_RATE);
+        if (err != paNoError) {
+            cerr << "Unsupported format" << endl;
+            return streamAbort(err, data);
+        }
+
         cout << "Input Device" << endl;
+        cout << "- Device Name: " << info->name << endl;
+        cout << "- Max Input Channels: " << info->maxInputChannels << endl;
+        cout << "- Max Output Channels: " << info->maxOutputChannels << endl;
         cout << "- Device Index: " << inputParams.device << endl;
         cout << "- Suggested Latency: " << inputParams.suggestedLatency << endl;
 

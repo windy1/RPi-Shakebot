@@ -1,0 +1,3 @@
+find actual device indices for in/out devices
+manually set the in PA if needed
+figure out why Pa_CloseStream hangs
