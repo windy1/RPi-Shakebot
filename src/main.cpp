@@ -4,11 +4,13 @@
 #include "audio/speech.h"
 #include "Shakebot.h"
 #include "graphics/graphics.h"
+#include "cmd/Command.h"
 
 sb::Shakebot bot;
 bool running = true;
 
 int main(int argc, char *argv[]) {
+    srand((unsigned) time(NULL));
     // parse arguments
     vector<string> args(argv, argv + argc);
     sf::Vector2f scale(1, 1);
@@ -35,6 +37,7 @@ int main(int argc, char *argv[]) {
     render->scale(scale);
     render->move(offset);
     sb::startSpeech();
+    sb::Command::loadLanguage();
     cout << "[running]" << endl;
 
     sf::RenderWindow *window = sb::getWindow();
@@ -68,6 +71,7 @@ namespace sb {
     }
 
     void onRecordFinished(const AudioData *data) {
+        bot.interpret(data);
     }
 
 }

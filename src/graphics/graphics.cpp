@@ -35,8 +35,8 @@ namespace sb {
                     window.close();
                     break;
                 case sf::Event::MouseButtonPressed:
-                    sb::getBot()->say("Hello, world!");
-                    //startRecording(onRecordFinished);
+                    //sb::getBot()->say("Hello, world!");
+                    startRecording(onRecordFinished);
                     break;
                 default:
                     break;

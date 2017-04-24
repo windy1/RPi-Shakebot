@@ -1,5 +1,6 @@
 #include "speech_api.h"
 #include "base64.h"
+#include "../rest_utils.h"
 #include <curl/curl.h>
 
 #define SPEECH_API_URL          "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
@@ -22,114 +23,47 @@ namespace sb {
         }}
     };
 
-    struct Response {
-        char *data;
-        size_t size;
-    };
-
-    static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp);
-    static bool curlAbort(CURL *curl, Response &response, char *buffer, bool result);
-
     bool speech2text(const AudioData *data, json &result) {
-        CURL                *curl           = NULL;
-        curl_slist          *requestHeaders = NULL;
-        json                requestBody;
-        const char          *requestBodyRaw;
-        CURLcode            responseCode;
-        Response            response;
-        size_t              numSamples      = (size_t) (data->maxFrameIndex * NUM_CHANNELS);
-        size_t              numBytes        = numSamples * sizeof(Sample);
-        char                *buffer         = (char*) malloc(numBytes);
-        string              encodedAudio;
-
-        cout << "Sending new Voice API request" << endl;
-        cout << "- Frames: " << data->maxFrameIndex << endl;
-
-
-        // allocate space for response
-        response.data = (char*) malloc(1);
-        response.size = 0;
-        if (response.data == NULL) {
-            cerr << "Could not allocate memory for response" << endl;
-            return curlAbort(curl, response, buffer, false);
-        }
-
         // copy sample data
+        size_t numSamples = (size_t) (data->maxFrameIndex * NUM_CHANNELS);
+        size_t numBytes = numSamples * sizeof(Sample);
+        char *buffer = (char*) malloc(numBytes);
+        if (buffer == NULL) {
+            cerr << "Could not allocate request buffer" << endl;
+            return false;
+        }
         memcpy(buffer, data->recordedSamples, numBytes);
 
-        // encode data
-        encodedAudio = base64_encode((const unsigned char*) buffer, (unsigned int) numBytes);
-        requestBody = REQUEST_BODY;
+        // encode data for request
+        string encodedAudio = base64_encode((const unsigned char*) buffer, (unsigned int) numBytes);
+        json requestBody = REQUEST_BODY;
         requestBody["audio"]["content"] = encodedAudio;
-        requestBodyRaw = requestBody.dump().c_str();
 
-        // construct headers
-        const char *contentLength = ("Content-Length: " + to_string(strlen(requestBodyRaw))).c_str();
-        requestHeaders = curl_slist_append(requestHeaders, HEADER_ACCEPT);
-        requestHeaders = curl_slist_append(requestHeaders, HEADER_CONTENT_TYPE);
-        requestHeaders = curl_slist_append(requestHeaders, contentLength);
-        requestHeaders = curl_slist_append(requestHeaders, HEADER_CHARSETS);
-
-        // initialize curl
-        curl = curl_easy_init();
-        if (curl) {
-            // request properties
-            curl_easy_setopt(curl, CURLOPT_URL, SPEECH_API_URL);
-            curl_easy_setopt(curl, CURLOPT_POST, true);
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, requestHeaders);
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, requestBodyRaw);
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponse);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-            curl_easy_setopt(curl, CURLOPT_VERBOSE, true);
-
-            // send request
-            responseCode = curl_easy_perform(curl);
-            if (responseCode == CURLE_OK) {
-                char *contentType;
-                responseCode = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
-                if (responseCode == CURLE_OK && string(contentType) == "application/json; charset=UTF-8") {
-                    result = json::parse(response.data);
-                    return curlAbort(curl, response, buffer, true);
-                } else {
-                    cerr << "Invalid content type: " << contentType << endl;
-                    return curlAbort(curl, response, buffer, false);
-                }
-            } else {
-                cerr << "cURL responded with error (code " << responseCode << ")" << endl;
-                return curlAbort(curl, response, buffer, false);
-            }
-        } else {
-            cerr << "Could not initialize cURL" << endl;
-            return curlAbort(curl, response, buffer, false);
-        }
-    }
-
-    static bool curlAbort(CURL *curl, Response &response, char *buffer, bool result) {
-        if (curl) {
-            curl_easy_cleanup(curl);
-        }
-        if (response.data) {
-            free(response.data);
-        }
-        if (buffer) {
+        // initialize client
+        RestClient client;
+        client.addHeader(HEADER_ACCEPT);
+        client.addHeader(HEADER_CONTENT_TYPE);
+        client.addHeader("Content-Length: " + to_string(strlen(requestBody.dump().c_str())));
+        client.addHeader(HEADER_CHARSETS);
+        if (!client.init()) {
+            cerr << "Could not initialize REST client" << endl;
             free(buffer);
+            return false;
         }
-        cout << "cURL Aborted." << endl;
-        return result;
-    }
 
-    static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {
-        size_t realSize = size * nmemb;
-        Response *response = (Response*) userp;
-        response->data = (char*) realloc(response->data, response->size + realSize + 1);
-        if(response->data == NULL) {
-            cerr << "Error: Could not reallocate response buffer" << endl;
-            return 0;
+        // perform request
+        cout << "Sending new Voice API request" << endl;
+        cout << "- Frames: " << data->maxFrameIndex << endl;
+        if (!client.post(requestBody.dump(), SPEECH_API_URL)) {
+            cerr << "Could not perform POST request" << endl;
+            free(buffer);
+            return false;
         }
-        memcpy(&(response->data[response->size]), contents, realSize);
-        response->size += realSize;
-        response->data[response->size] = 0;
-        return realSize;
+
+        free(buffer);
+        result = client.getResponse()->json();
+
+        return true;
     }
 
 }

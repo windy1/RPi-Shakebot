@@ -2,6 +2,7 @@
 #include <regex>
 #include <iostream>
 #include "audio/speech.h"
+#include "cmd/Command.h"
 
 const regex syllableRegex("[aeiouy]+");
 
@@ -36,7 +37,7 @@ namespace sb {
                 if (firstWord) {
                     if (!voxStarted) {
                         voxPromise = promise<bool>();
-                        sb::pushSpeech(phraseBuffer, voxPromise);
+                        pushSpeech(phraseBuffer, voxPromise);
                         voxFuture = voxPromise.get_future();
                         delayClock.restart();
                         voxStarted = true;
@@ -79,7 +80,24 @@ namespace sb {
     }
 
     void Shakebot::interpret(const AudioData *data) {
+        json response;
+        speech2text(data, response);
+        cout << response.dump(4) << endl;
+        if (response.empty()) {
+            cerr << "Empty response" << endl;
+            return;
+        }
 
+        json alternatives = response["results"][0]["alternatives"];
+        cout << alternatives << endl;
+
+        for (auto alt : alternatives) {
+            cout << alt << endl;
+            cmd_ptr cmd = Command::parse(alt["transcript"]);
+            if (cmd != NULL) {
+                say(cmd->execute());
+            }
+        }
     }
 
     int countSyllables(const string phrase, unsigned int n) {

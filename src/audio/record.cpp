@@ -9,6 +9,7 @@ using namespace std;
 
 namespace sb {
 
+    static AudioData        data;
     static PaStream         *stream     = NULL;
     static RecordCallback   *callback   = NULL;
     static bool             interrupt   = false;
@@ -37,7 +38,6 @@ namespace sb {
         }
 
         PaError         err         = paNoError;
-        AudioData       data;
         int             numFrames   = MAX_SECONDS * SAMPLE_RATE;
         int             numSamples  = numFrames * NUM_CHANNELS;
         unsigned int    numBytes    = numSamples * sizeof(Sample);
@@ -49,6 +49,7 @@ namespace sb {
         cout << "- Max bytes: " << numBytes << endl;
 
         // initialize data buffer
+        data = {};
         data.maxFrameIndex = numFrames;
         data.frameIndex = 0;
         data.recordedSamples = (Sample*) malloc(numBytes);
