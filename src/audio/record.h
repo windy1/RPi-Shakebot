@@ -2,6 +2,7 @@
 #define SHAKESPEARE_RECORD_H
 
 #include <portaudio.h>
+#include <functional>
 #include "audio.h"
 
 namespace sb {
