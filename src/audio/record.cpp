@@ -42,6 +42,7 @@ namespace sb {
         // close and terminate pa
         cout << "closing stream" << endl;
         PaError err = Pa_CloseStream(stream);
+        cout << "stream closed" << endl;
         if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
             cout << "error" << endl;
             printErr(err);
