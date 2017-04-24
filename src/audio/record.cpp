@@ -176,7 +176,7 @@ namespace sb {
         long frames;
         int finished;
 
-        //cout << ".";
+        cout << ".";
         if (interrupt) {
             // FIXME
             cout << data->frameIndex << endl;
