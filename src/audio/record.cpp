@@ -11,7 +11,7 @@ namespace sb {
 
     AudioData        data;
     PaStream         *stream     = NULL;
-    RecordCallback   callback    = NULL;
+    RecordCallback   callback;
     bool             interrupt   = false;
 
     void printErr(PaError err) {
@@ -38,13 +38,13 @@ namespace sb {
     void onStreamFinished(void *audioData) {
         // close stream and pass callback recorded data
         cout << "Stream complete." << endl;
-        assert(callback != NULL);
         assert(audioData != NULL);
         // close and terminate pa
         PaError err = Pa_CloseStream(stream);
         if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
             printErr(err);
         } else {
+            cout << "Executing callback" << endl;
             AudioData data = *(AudioData*) audioData;
             callback(&data);
             // free sample memory
