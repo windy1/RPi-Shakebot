@@ -70,8 +70,4 @@ namespace sb {
         running = r;
     }
 
-    void onRecordFinished(const AudioData *data) {
-        bot.interpret(data);
-    }
-
 }

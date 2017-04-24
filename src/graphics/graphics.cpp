@@ -27,6 +27,11 @@ namespace sb {
         window.setKeyRepeatEnabled(KEY_REPEAT);
     }
 
+    void onRecordFinished(const AudioData *data) {
+        cout << "onRecordFinished" << endl;
+        sb::getBot()->interpret(data);
+    }
+
     void pollInput() {
         sf::Event event;
         while (window.pollEvent(event)) {

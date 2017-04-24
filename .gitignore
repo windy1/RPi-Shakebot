@@ -5,3 +5,4 @@
 run
 configure
 .DS_Store
+*.swp
