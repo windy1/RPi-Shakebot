@@ -14,7 +14,6 @@ namespace sb {
     static RecordCallback   *callback   = NULL;
     static bool             interrupt   = false;
 
-    static void onStreamFinished(void *audioData);
     static void printErr(PaError err);
     static bool streamAbort(PaError err, AudioData &data);
 
@@ -77,6 +76,25 @@ namespace sb {
         return finished;
     }
 
+    static void onStreamFinished(void *audioData) {
+        // close stream and pass callback recorded data
+        assert(callback != NULL);
+        assert(audioData != NULL);
+        // close and terminate pa
+        PaError err = Pa_CloseStream(stream);
+        if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
+            printErr(err);
+        } else {
+            AudioData data = *(AudioData*) audioData;
+            cout << "Stream complete." << endl;
+            callback(&data);
+            // free sample memory
+            if (data.recordedSamples) {
+                free(data.recordedSamples);
+            }
+        }
+    }
+
     bool isActive() {
         return Pa_IsStreamActive(stream) == 1;
     }
@@ -134,7 +152,7 @@ namespace sb {
         cout << "Input Device" << endl;
         cout << "- Device Index: " << inputParams.device << endl;
         cout << "- Suggested Latency: " << inputParams.suggestedLatency << endl;
-        
+
         // open stream
         err = Pa_OpenStream(
                 &stream,
@@ -182,25 +200,6 @@ namespace sb {
         Pa_Terminate();
         cerr << "Stream aborted." << endl;
         return false;
-    }
-
-    static void onStreamFinished(void *audioData) {
-        // close stream and pass callback recorded data
-        assert(callback != NULL);
-        assert(audioData != NULL);
-        // close and terminate pa
-        PaError err = Pa_CloseStream(stream);
-        if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
-            printErr(err);
-        } else {
-            AudioData data = *(AudioData*) audioData;
-            cout << "Stream complete." << endl;
-            callback(&data);
-            // free sample memory
-            if (data.recordedSamples) {
-                free(data.recordedSamples);
-            }
-        }
     }
 
     bool stopRecording() {
