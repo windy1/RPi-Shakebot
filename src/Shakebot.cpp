@@ -19,7 +19,7 @@ namespace sb {
         return &render;
     }
 
-    void Shakebot::say(const string phrase) {
+    void Shakebot::say(string phrase) {
         phraseBuffer = phrase;
     }
 
@@ -79,18 +79,20 @@ namespace sb {
         }
     }
 
-    void Shakebot::interpret(const AudioData *data) {
+    bool Shakebot::interpret(const AudioData *data) {
         json response;
-        speech2text(data, response);
+        if (!speech2text(data, response)) {
+            cerr << "Could not retrieve voice translation" << endl;
+            return false;
+        }
         cout << response.dump(4) << endl;
         if (response.empty()) {
             cerr << "Empty response" << endl;
-            return;
+            return false;
         }
 
         json alternatives = response["results"][0]["alternatives"];
         cout << alternatives << endl;
-
         for (auto alt : alternatives) {
             cout << alt << endl;
             cmd_ptr cmd = Command::parse(alt["transcript"]);
@@ -98,9 +100,11 @@ namespace sb {
                 say(cmd->execute());
             }
         }
+
+        return true;
     }
 
-    int countSyllables(const string phrase, unsigned int n) {
+    int countSyllables(string phrase, unsigned int n) {
         if (phrase.empty()) {
             return n;
         }

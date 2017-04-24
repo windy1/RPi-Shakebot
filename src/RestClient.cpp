@@ -1,5 +1,5 @@
 #include <cstdlib>
-#include "rest_utils.h"
+#include "RestClient.h"
 
 namespace sb {
 
@@ -29,6 +29,7 @@ namespace sb {
     }
 
     bool RestClient::init() {
+        // preconditions
         if (response.data) {
             cerr << "Response data already allocated" << endl;
             return false;
@@ -38,6 +39,7 @@ namespace sb {
             return false;
         }
 
+        // allocate response
         response.data = (char*) malloc(1);
         response.size = 0;
         if (response.data == NULL) {
@@ -45,12 +47,14 @@ namespace sb {
             return false;
         }
 
+        // initialize curl
         curl = curl_easy_init();
-        if (!curl) {
+        if (curl == NULL) {
             cerr << "Could not initialize cURL" << endl;
             return false;
         }
 
+        // configure curl
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, requestHeaders);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponse);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
@@ -59,25 +63,27 @@ namespace sb {
         return true;
     }
 
-    bool RestClient::post(string data, string url, string resultType) {
+    RestResponse* RestClient::post(string data, string url, string resultType) {
         assert(curl != NULL);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
         return perform(url, true, resultType);
     }
 
-    bool RestClient::get(string url, string resultType) {
+    RestResponse* RestClient::get(string url, string resultType) {
         return perform(url, false, resultType);
     }
 
-    bool RestClient::perform(string url, bool post, string resultType) {
-        // perform curl
+    RestResponse* RestClient::perform(string url, bool post, string resultType) {
         assert(curl != NULL);
+
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_POST, post);
+
+        // perform curl
         response.code = curl_easy_perform(curl);
         if (response.code != CURLE_OK) {
             cerr << "cURL responded with an error (code " << response.code << ")" << endl;
-            return false;
+            return NULL;
         }
 
         // check result type
@@ -85,27 +91,24 @@ namespace sb {
         response.code = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
         if (response.code != CURLE_OK) {
             cerr << "Could not get content type" << endl;
-            return false;
+            return NULL;
         }
         if (string(contentType) != resultType) {
             cerr << "Unexpected result content type: " << contentType << endl;
-            return false;
+            return NULL;
         }
 
-        return true;
-    }
-
-    Response* RestClient::getResponse() {
         return &response;
     }
 
-    json Response::json() {
+    json RestResponse::json() {
+        assert(data != NULL);
         return json::parse(data);
     }
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {
         size_t realSize = size * nmemb;
-        Response *response = (Response*) userp;
+        RestResponse *response = (RestResponse*) userp;
         response->data = (char*) realloc(response->data, response->size + realSize + 1);
         if(response->data == NULL) {
             cerr << "Error: Could not reallocate response buffer" << endl;

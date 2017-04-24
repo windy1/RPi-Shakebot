@@ -27,6 +27,11 @@ namespace sb {
      */
     void setRunning(bool running);
 
+    /**
+     * Callback for when audio recordings have finished.
+     *
+     * @param data Recorded data
+     */
     void onRecordFinished(const AudioData *data);
 
 }

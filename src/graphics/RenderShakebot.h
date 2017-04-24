@@ -29,8 +29,18 @@ namespace sb {
 
         RenderShakebot(Shakebot *bot, string textureFile, sf::IntRect mouthRect);
 
+        /**
+         * Scales the render by the specified amount.
+         *
+         * @param scale Scale amount
+         */
         void scale(sf::Vector2f scale);
 
+        /**
+         * Moves the render by the specified offset.
+         *
+         * @param v offset amount
+         */
         void move(sf::Vector2f v);
 
         /**

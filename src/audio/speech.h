@@ -10,6 +10,9 @@ using namespace std;
 
 namespace sb {
 
+    /**
+     * A single phrase to perform.
+     */
     struct Phrase {
         promise<bool> &pr;
         string str;

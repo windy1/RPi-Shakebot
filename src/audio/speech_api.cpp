@@ -1,6 +1,6 @@
 #include "speech_api.h"
 #include "base64.h"
-#include "../rest_utils.h"
+#include "../RestClient.h"
 #include <curl/curl.h>
 
 #define SPEECH_API_URL          "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
@@ -54,14 +54,15 @@ namespace sb {
         // perform request
         cout << "Sending new Voice API request" << endl;
         cout << "- Frames: " << data->maxFrameIndex << endl;
-        if (!client.post(requestBody.dump(), SPEECH_API_URL)) {
+        RestResponse *response = client.post(requestBody.dump(), SPEECH_API_URL);
+        if (response == NULL) {
             cerr << "Could not perform POST request" << endl;
             free(buffer);
             return false;
         }
 
         free(buffer);
-        result = client.getResponse()->json();
+        result = response->json();
 
         return true;
     }
