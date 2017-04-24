@@ -41,8 +41,7 @@ namespace sb {
         assert(audioData != NULL);
         // close and terminate pa
         cout << "closing stream" << endl;
-        //PaError err = Pa_CloseStream(stream);
-        PaError err = paNoError;
+        PaError err = Pa_CloseStream(stream);
         cout << "stream closed" << endl;
         if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
             cout << "error" << endl;
@@ -62,7 +61,7 @@ namespace sb {
                        const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
         // unused
-        cout << ".";
+        //cout << ".";
         (void) outputBuffer;
         (void) timeInfo;
         (void) statusFlags;
