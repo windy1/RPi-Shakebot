@@ -11,7 +11,7 @@ namespace sb {
 
     AudioData        data;
     PaStream         *stream     = NULL;
-    RecordCallback   *callback   = NULL;
+    RecordCallback   callback    = NULL;
     bool             interrupt   = false;
 
     void printErr(PaError err) {
@@ -117,7 +117,7 @@ namespace sb {
         return Pa_IsStreamActive(stream) == 1;
     }
 
-    bool startRecording(RecordCallback *cback) {
+    bool startRecording(RecordCallback cback) {
         assert(cback != NULL);
         if (isActive()) {
             cerr << "Stream is active" << endl;
