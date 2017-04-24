@@ -9,91 +9,18 @@ using namespace std;
 
 namespace sb {
 
-    static AudioData        data;
-    static PaStream         *stream     = NULL;
-    static RecordCallback   *callback   = NULL;
-    static bool             interrupt   = false;
+    AudioData        data;
+    PaStream         *stream     = NULL;
+    RecordCallback   *callback   = NULL;
+    bool             interrupt   = false;
 
-    static void printErr(PaError err);
-    static bool streamAbort(PaError err, AudioData &data);
+    void printErr(PaError err);
+    bool streamAbort(PaError err, AudioData &data);
+    void onStreamFinished(void *audioData);
 
-    static int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
-                              const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
-                              void *userData) {
-        // unused
-        (void) outputBuffer;
-        (void) timeInfo;
-        (void) statusFlags;
-
-        AudioData *data = (AudioData*) userData;
-        const Sample *in = (const Sample*) inputBuffer;
-        // sampleData starts at current frame
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
-        long frames;
-        int finished;
-
-        cout << ".";
-        if (interrupt) {
-            // FIXME
-            cout << data->frameIndex << endl;
-            cout << "Active recording stream interrupted ";
-            cout << "(frame " << to_string(data->frameIndex) << "/";
-            cout << to_string(data->maxFrameIndex) << ")" << endl;
-            interrupt = false;
-            return paComplete;
-        }
-
-        unsigned long framesLeft = (unsigned long) (data->maxFrameIndex - data->frameIndex);
-        if (framesLeft < framesPerBuffer) {
-            // write the rest of the frames
-            frames = framesLeft;
-            finished = paComplete;
-        } else {
-            // write the standard amount of frames
-            frames = framesPerBuffer;
-            finished = paContinue;
-        }
-
-        // take samples
-        if (inputBuffer == NULL) {
-            // no new data
-            for (long i = 0; i < frames; i++) {
-                *sampleData++ = SAMPLE_SILENCE;
-                if (NUM_CHANNELS == 2) {
-                    *sampleData++ = SAMPLE_SILENCE;
-                }
-            }
-        } else {
-            for (long i = 0; i < frames; i++) {
-                *sampleData++ = *in++;
-                if (NUM_CHANNELS == 2) {
-                    *sampleData++ = *in++;
-                }
-            }
-        }
-
-        data->frameIndex += frames;
-        return finished;
-    }
-
-    static void onStreamFinished(void *audioData) {
-        // close stream and pass callback recorded data
-        assert(callback != NULL);
-        assert(audioData != NULL);
-        // close and terminate pa
-        PaError err = Pa_CloseStream(stream);
-        if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
-            printErr(err);
-        } else {
-            AudioData data = *(AudioData*) audioData;
-            cout << "Stream complete." << endl;
-            callback(&data);
-            // free sample memory
-            if (data.recordedSamples) {
-                free(data.recordedSamples);
-            }
-        }
-    }
+    int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+                       const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
+                       void *userData);
 
     bool isActive() {
         return Pa_IsStreamActive(stream) == 1;
@@ -187,7 +114,26 @@ namespace sb {
         return true;
     }
 
-    static bool streamAbort(PaError err, AudioData &data) {
+    void onStreamFinished(void *audioData) {
+        // close stream and pass callback recorded data
+        assert(callback != NULL);
+        assert(audioData != NULL);
+        // close and terminate pa
+        PaError err = Pa_CloseStream(stream);
+        if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
+            printErr(err);
+        } else {
+            AudioData data = *(AudioData*) audioData;
+            cout << "Stream complete." << endl;
+            callback(&data);
+            // free sample memory
+            if (data.recordedSamples) {
+                free(data.recordedSamples);
+            }
+        }
+    }
+
+    bool streamAbort(PaError err, AudioData &data) {
         if (err != paNoError) {
             printErr(err);
         }
@@ -200,6 +146,65 @@ namespace sb {
         Pa_Terminate();
         cerr << "Stream aborted." << endl;
         return false;
+    }
+
+    int recordCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+                       const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
+                       void *userData) {
+        // unused
+        (void) outputBuffer;
+        (void) timeInfo;
+        (void) statusFlags;
+
+        AudioData *data = (AudioData*) userData;
+        const Sample *in = (const Sample*) inputBuffer;
+        // sampleData starts at current frame
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
+        long frames;
+        int finished;
+
+        cout << ".";
+        if (interrupt) {
+            // FIXME
+            cout << data->frameIndex << endl;
+            cout << "Active recording stream interrupted ";
+            cout << "(frame " << to_string(data->frameIndex) << "/";
+            cout << to_string(data->maxFrameIndex) << ")" << endl;
+            interrupt = false;
+            return paComplete;
+        }
+
+        unsigned long framesLeft = (unsigned long) (data->maxFrameIndex - data->frameIndex);
+        if (framesLeft < framesPerBuffer) {
+            // write the rest of the frames
+            frames = framesLeft;
+            finished = paComplete;
+        } else {
+            // write the standard amount of frames
+            frames = framesPerBuffer;
+            finished = paContinue;
+        }
+
+        // take samples
+        if (inputBuffer == NULL) {
+            // no new data
+            for (long i = 0; i < frames; i++) {
+                *sampleData++ = SAMPLE_SILENCE;
+                if (NUM_CHANNELS == 2) {
+                    *sampleData++ = SAMPLE_SILENCE;
+                }
+            }
+        } else {
+            for (long i = 0; i < frames; i++) {
+                *sampleData++ = *in++;
+                if (NUM_CHANNELS == 2) {
+                    *sampleData++ = *in++;
+                }
+            }
+        }
+
+        data->frameIndex += frames;
+        return finished;
     }
 
     bool stopRecording() {
@@ -217,50 +222,9 @@ namespace sb {
         cerr << "Error message: " << Pa_GetErrorText(err) << endl;
     }
 
-    static int playCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
-                            const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
-                            void *userData) {
-        // unused
-        (void) inputBuffer;
-        (void) timeInfo;
-        (void) statusFlags;
-
-        // write data to output device
-        AudioData *data = (AudioData*) userData;
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
-        Sample *out = (Sample*) outputBuffer;
-        int finished;
-
-        unsigned int framesLeft = (unsigned int) (data->maxFrameIndex - data->frameIndex);
-        if (framesLeft < framesPerBuffer) {
-            int i = 0;
-            for (i = 0; i < framesLeft; i++) {
-                *out++ = *sampleData++;
-                if (NUM_CHANNELS == 2) {
-                    *out++ = *sampleData++;
-                }
-            }
-            for (; i < framesPerBuffer; i++) {
-                *out++ = 0;
-                if (NUM_CHANNELS == 2) {
-                    *out++ = 0;
-                }
-            }
-            data->frameIndex += framesLeft;
-            finished = paComplete;
-        } else {
-            for (int i = 0; i < framesPerBuffer; i++) {
-                *out++ = *sampleData++;
-                if (NUM_CHANNELS == 2) {
-                    *out++ = *sampleData++;
-                }
-            }
-            data->frameIndex += framesPerBuffer;
-            finished = paContinue;
-        }
-
-        return finished;
-    }
+    int playCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+                     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
+                     void *userData);
 
     bool playAudio(const AudioData *audioData) {
         AudioData data = *audioData;
@@ -325,6 +289,51 @@ namespace sb {
             return true;
         }
         return false;
+    }
+
+    int playCallback(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
+                     const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
+                     void *userData) {
+        // unused
+        (void) inputBuffer;
+        (void) timeInfo;
+        (void) statusFlags;
+
+        // write data to output device
+        AudioData *data = (AudioData*) userData;
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
+        Sample *out = (Sample*) outputBuffer;
+        int finished;
+
+        unsigned int framesLeft = (unsigned int) (data->maxFrameIndex - data->frameIndex);
+        if (framesLeft < framesPerBuffer) {
+            int i = 0;
+            for (i = 0; i < framesLeft; i++) {
+                *out++ = *sampleData++;
+                if (NUM_CHANNELS == 2) {
+                    *out++ = *sampleData++;
+                }
+            }
+            for (; i < framesPerBuffer; i++) {
+                *out++ = 0;
+                if (NUM_CHANNELS == 2) {
+                    *out++ = 0;
+                }
+            }
+            data->frameIndex += framesLeft;
+            finished = paComplete;
+        } else {
+            for (int i = 0; i < framesPerBuffer; i++) {
+                *out++ = *sampleData++;
+                if (NUM_CHANNELS == 2) {
+                    *out++ = *sampleData++;
+                }
+            }
+            data->frameIndex += framesPerBuffer;
+            finished = paContinue;
+        }
+
+        return finished;
     }
 
 }
