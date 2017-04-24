@@ -170,9 +170,16 @@ namespace sb {
             cerr << "No default input device" << endl;
             return streamAbort(err, data);
         }
+        const PaDeviceInfo *info = Pa_GetDeviceInfo(inputParams.device);
+
+        cout << "Input Device" << endl;
+        cout << "- Device Name: " << info->name << endl;
+        cout << "- Max Input Channels: " << info->maxInputChannels << endl;
+        cout << "- Max Output Channels: " << info->maxOutputChannels << endl;
+        cout << "- Device Index: " << inputParams.device << endl;
+
         inputParams.channelCount = NUM_CHANNELS;
         inputParams.sampleFormat = SAMPLE_FORMAT;
-        const PaDeviceInfo *info = Pa_GetDeviceInfo(inputParams.device);
         inputParams.suggestedLatency = info->defaultLowInputLatency;
         inputParams.hostApiSpecificStreamInfo = NULL;
 
@@ -181,13 +188,6 @@ namespace sb {
             cerr << "Unsupported format" << endl;
             return streamAbort(err, data);
         }
-
-        cout << "Input Device" << endl;
-        cout << "- Device Name: " << info->name << endl;
-        cout << "- Max Input Channels: " << info->maxInputChannels << endl;
-        cout << "- Max Output Channels: " << info->maxOutputChannels << endl;
-        cout << "- Device Index: " << inputParams.device << endl;
-        cout << "- Suggested Latency: " << inputParams.suggestedLatency << endl;
 
         // open stream
         err = Pa_OpenStream(
