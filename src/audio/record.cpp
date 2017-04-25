@@ -255,7 +255,7 @@ namespace sb {
 
         // write data to output device
         AudioData *data = (AudioData*) userData;
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_PLAYBACK];
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
         Sample *out = (Sample*) outputBuffer;
         int finished;
 
@@ -263,9 +263,12 @@ namespace sb {
         if (framesLeft < framesPerBuffer) {
             int i = 0;
             for (i = 0; i < framesLeft; i++) {
-                *out++ = *sampleData++;
+                Sample sample = *sampleData++;
+                //*out++ = *sampleData++;
+                *out++ = sample;
                 if (CHANNEL_COUNT_PLAYBACK == 2) {
-                    *out++ = *sampleData++;
+                    //*out++ = *sampleData++;
+                    *out++ = sample;
                 }
             }
             for (; i < framesPerBuffer; i++) {
@@ -278,9 +281,12 @@ namespace sb {
             finished = paComplete;
         } else {
             for (int i = 0; i < framesPerBuffer; i++) {
-                *out++ = *sampleData++;
+                Sample sample = *sampleData++;
+                //*out++ = *sampleData++;
+                *out++ = sample;
                 if (CHANNEL_COUNT_PLAYBACK == 2) {
-                    *out++ = *sampleData++;
+                    //*out++ = *sampleData++;
+                    *out++ = sample;
                 }
             }
             data->frameIndex += framesPerBuffer;
