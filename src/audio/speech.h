@@ -4,7 +4,6 @@
 #include <thread>
 #include <string>
 #include <future>
-#include "record.h"
 
 using namespace std;
 

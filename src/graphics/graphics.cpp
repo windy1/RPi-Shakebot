@@ -1,7 +1,6 @@
 #include <SFML/Config.hpp>
 #include <SFML/Window.hpp>
 #include "graphics.h"
-#include "../audio/record.h"
 #include "../app.h"
 #include "../Shakebot.h"
 #include "../audio/AudioClient.h"
