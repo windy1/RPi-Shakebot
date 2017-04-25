@@ -22,6 +22,8 @@
 
 typedef int16_t Sample;
 
+using namespace std;
+
 /**
  * Raw PCM audio data. Each sample recorded represents an amplitude of the
  * sound wave received.

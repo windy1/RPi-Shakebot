@@ -3,6 +3,7 @@
 #include "audio/record.h"
 #include "audio/flac.h"
 #include "audio/speech.h"
+#include "audio/AudioClient.h"
 #include <fstream>
 #include <festival/festival.h>
 
@@ -101,12 +102,37 @@ namespace sb {
 
         cout << "Recording for default time..." << endl;
         int failed = 0;
-        if (!sb::startRecording(onRecordFinish)) {
-            cout << "- [failed] could not start recording" << endl;
+//        if (!sb::startRecording(onRecordFinish)) {
+//            cout << "- [failed] could not start recording" << endl;
+//            failed++;
+//            recordFinished = true;
+//        }
+//        while (!recordFinished);
+
+        AudioClient client;
+        if (!client.init()) {
+            cerr << "Could not initialize client" << endl;
             failed++;
-            recordFinished = true;
+        } else if (!client.setCaptureDevice(DEVICE_INDEX)) {
+            cerr << "Could not initialize capture device" << endl;
+            failed++;
+        } else {
+            AudioDevice *device = client.getCaptureDevice();
+            device->params.channelCount = CHANNEL_COUNT_CAPTURE;
+            device->params.sampleFormat = SAMPLE_FORMAT;
+            device->bufferSize = BUFFER_SIZE_CAPTURE;
+            cout << *device << endl;
+            if (isActive()) {
+                cerr << "Client should not be active yet" << endl;
+                failed++;
+            } else if (!client.canRecord()) {
+                cerr << "Client should be able to record" << endl;
+                failed++;
+            } else if (!client.record(MAX_SECONDS)) {
+                cerr << "Failed to start recording" << endl;
+                failed++;
+            }
         }
-        while (!recordFinished);
 
         cout << "Done." << endl;
         return failed;
