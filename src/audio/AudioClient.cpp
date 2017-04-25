@@ -225,15 +225,22 @@ namespace sb {
     }
 
     bool AudioClient::isOpened() {
-        return initialized && stream != NULL && Pa_IsStreamActive(stream) == 1;
+        bool result = initialized && stream != NULL;
+#ifdef __APPLE__
+        result &= Pa_IsStreamActive(stream) == 1;
+#endif
+        return result;
     }
 
     bool AudioClient::close() {
+        // the RPi doesn't seem to like this for some reason
+#ifdef __APPLE__
         PaError err = Pa_CloseStream(stream);
         if (err != paNoError) {
             paErr(err);
             return false;
         }
+#endif
         return true;
     }
 
