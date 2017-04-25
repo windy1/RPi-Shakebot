@@ -148,7 +148,6 @@ namespace sb {
         data.numFrames = numFrames;
         data.frameIndex = 0;
         data.recordedSamples = (Sample*) malloc(numBytes);
-        cout << &data.recordedSamples << endl;
         if (data.recordedSamples == NULL) {
             cerr << "Could not allocate record array" << endl;
             return streamAbort(err, data);
