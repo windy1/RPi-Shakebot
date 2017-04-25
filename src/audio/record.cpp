@@ -134,7 +134,10 @@ namespace sb {
         unsigned        numBytes    = numSamples * sizeof(Sample);
 
         cout << "Starting new recording" << endl;
-        cout << "- Sample Size: " << sizeof(Sample) << endl;
+        cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
+        cout << "- Channels: " << NUM_CHANNELS << endl;
+        cout << "- Sample Rate: " << SAMPLE_RATE << " Hz" << endl;
+        cout << "- Buffer Size: " << BUFFER_SIZE << endl;
         cout << "- Max Frames: " << numFrames << endl;
         cout << "- Max Samples: " << numSamples << endl;
         cout << "- Max bytes: " << numBytes << endl;
@@ -204,7 +207,7 @@ namespace sb {
                 &inputParams,
                 NULL,
                 SAMPLE_RATE,
-                FRAMES_PER_BUFFER,
+                BUFFER_SIZE,
                 paClipOff,
                 recordCallback,
                 &data);
@@ -323,7 +326,7 @@ namespace sb {
                 NULL,
                 &outputParams,
                 SAMPLE_RATE,
-                FRAMES_PER_BUFFER,
+                BUFFER_SIZE,
                 paClipOff,
                 playCallback,
                 &data);

@@ -2,11 +2,12 @@
 #define SHAKESPEARE_AUDIO_H_H
 
 #include <cstdint>
+#include <portaudio.h>
 
 #define MAX_SECONDS         5           // seconds to record
 #define NUM_CHANNELS        1           // hw limited to mono
 #define SAMPLE_RATE         44800       // optimal is 16000, limited by hw
-#define FRAMES_PER_BUFFER   512         // frames to load into memory each cycle
+#define BUFFER_SIZE         24000       // frames to load into memory each cycle
 #define SAMPLE_SILENCE      0           // silence sample value
 #define SAMPLE_FORMAT       paInt16     // hw requires 16-bit samples
 #define ENCODING            "LINEAR16"  // the encoding id for voice api
@@ -17,7 +18,7 @@
 #define DEVICE_INDEX 2                  // hardcoded for RPi
 #endif
 
-typedef uint16_t Sample;
+typedef int16_t Sample;
 
 /**
  * Raw PCM audio data. Each sample recorded represents an amplitude of the

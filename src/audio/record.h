@@ -1,7 +1,6 @@
 #ifndef SHAKESPEARE_RECORD_H
 #define SHAKESPEARE_RECORD_H
 
-#include <portaudio.h>
 #include <functional>
 #include "audio.h"
 

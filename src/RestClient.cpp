@@ -30,10 +30,10 @@ namespace sb {
     }
 
     bool RestClient::init() {
-        if (this) {
-            cerr << "Client already initialized" << endl;
-            return false;
-        }
+//        if (this) {
+//            cerr << "Client already initialized" << endl;
+//            return false;
+//        }
 
         // allocate response
         response.data = (char*) malloc(1);
