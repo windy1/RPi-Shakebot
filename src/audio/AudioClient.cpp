@@ -225,9 +225,9 @@ namespace sb {
     }
 
     bool AudioClient::isOpened() {
-        bool result = initialized && stream != NULL;
+        bool result = initialized;
 #ifdef __APPLE__
-        result &= Pa_IsStreamActive(stream) == 1;
+        result &= stream != NULL && Pa_IsStreamActive(stream) == 1;
 #endif
         return result;
     }
