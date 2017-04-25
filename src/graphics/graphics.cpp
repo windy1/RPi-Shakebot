@@ -28,6 +28,7 @@ namespace sb {
 
     void onRecordFinished(AudioData *data) {
         cout << "onRecordFinished" << endl;
+        sb::getAudioClient()->close();
         sb::getBot()->interpret(data);
     }
 

@@ -25,22 +25,12 @@ namespace sb {
         // close stream and pass callback recorded data
         cout << "Stream complete." << endl;
         assert(audioData != NULL);
-        // close and terminate pa
-        cout << "closing stream" << endl;
-        PaError err = /*Pa_CloseStream(stream)*/ paNoError; // FIXME: hangs on RPi
-        cout << "stream closed" << endl;
-        if (err != paNoError) {
-            cout << "error" << endl;
-            paErr(err);
-        } else {
-            cout << "Executing callback" << endl;
-            AudioData *data = (AudioData*) audioData;
-            data->callback(data);
-            // free sample memory
-            if (data->recordedSamples != NULL) {
-                free(data->recordedSamples);
-                data->recordedSamples = NULL;
-            }
+        AudioData *data = (AudioData*) audioData;
+        data->callback(data);
+        // free sample memory
+        if (data->recordedSamples != NULL) {
+            free(data->recordedSamples);
+            data->recordedSamples = NULL;
         }
     }
 
@@ -236,6 +226,15 @@ namespace sb {
 
     bool AudioClient::isOpened() {
         return initialized && stream != NULL && Pa_IsStreamActive(stream) == 1;
+    }
+
+    bool AudioClient::close() {
+        PaError err = Pa_CloseStream(stream);
+        if (err != paNoError) {
+            paErr(err);
+            return false;
+        }
+        return true;
     }
 
     bool AudioClient::canRecord() {

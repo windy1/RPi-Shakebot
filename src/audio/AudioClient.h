@@ -64,6 +64,13 @@ namespace sb {
         bool isOpened();
 
         /**
+         * Attempts to close the active stream.
+         *
+         * @return True if closed
+         */
+        bool close();
+
+        /**
          * Returns true if the client is ready to record.
          *
          * @return True if ready to record

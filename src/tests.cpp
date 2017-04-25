@@ -141,6 +141,10 @@ namespace sb {
 
     void onRecordFinish(AudioData *data) {
         cout << "- Finished recording" << endl;
+        if (!client.close()) {
+            cerr << "Failed to close stream" << endl;
+            return;
+        }
         if (!client.setPlaybackDevice(DEVICE_INDEX)) {
             cerr << "Could not initialize playback device" << endl;
             return;
