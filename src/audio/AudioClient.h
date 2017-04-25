@@ -2,7 +2,6 @@
 #define SHAKESPEARE_AUDIORECORDER_H
 
 #include "audio.h"
-#include "AudioDevice.h"
 #include <portaudio.h>
 
 using namespace std;

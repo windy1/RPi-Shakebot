@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <portaudio.h>
+#include <iostream>
 
 #define MAX_SECONDS             5           // seconds to record
 #define CHANNEL_COUNT_CAPTURE   1           // hw limited to mono
@@ -32,6 +33,16 @@ struct AudioData {
     int     frameIndex;                 // incremented iterating sample data
     int     numFrames;                  // the total amount of frames in the recording
     Sample  *recordedSamples;           // block of memory containing samples
+};
+
+struct AudioDevice {
+
+    PaStreamParameters  params;
+    unsigned long       bufferSize      = 0;
+    int                 sampleRate      = SAMPLE_RATE;
+
+    friend ostream& operator<<(ostream &out, const AudioDevice &device);
+
 };
 
 #endif //SHAKESPEARE_AUDIO_H_H

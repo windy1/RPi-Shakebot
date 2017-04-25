@@ -17,7 +17,7 @@ set(SOURCE_FILES
         src/audio/flac.cpp src/audio/flac.h
         src/audio/base64.cpp src/audio/base64.h
         src/audio/speech_api.cpp src/audio/speech_api.h
-        src/audio/audio.h src/graphics/graphics.cpp src/graphics/graphics.h src/cmd/Command.cpp src/cmd/Command.h src/cmd/GreetingCommand.cpp src/cmd/GreetingCommand.h src/cmd/wiki_api.cpp src/cmd/wiki_api.h src/RestClient.cpp src/RestClient.h src/audio/AudioClient.cpp src/audio/AudioClient.h src/audio/AudioDevice.cpp src/audio/AudioDevice.h)
+        src/audio/audio.h src/graphics/graphics.cpp src/graphics/graphics.h src/cmd/Command.cpp src/cmd/Command.h src/cmd/GreetingCommand.cpp src/cmd/GreetingCommand.h src/cmd/wiki_api.cpp src/cmd/wiki_api.h src/RestClient.cpp src/RestClient.h src/audio/AudioClient.cpp src/audio/AudioClient.h src/audio/audio.cpp)
 add_executable(shakespeare ${SOURCE_FILES})
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")
