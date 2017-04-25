@@ -122,13 +122,14 @@ namespace sb {
             device->params.sampleFormat = SAMPLE_FORMAT;
             device->bufferSize = BUFFER_SIZE_CAPTURE;
             cout << *device << endl;
-            if (client.isOpened()) {
-                cerr << "Client should not be active yet" << endl;
-                failed++;
-            } else if (!client.canRecord()) {
-                cerr << "Client should be able to record" << endl;
-                failed++;
-            } else if (!client.record(MAX_SECONDS, onRecordFinish)) {
+//            if (client.isOpened()) {
+//                cerr << "Client should not be active yet" << endl;
+//                failed++;
+//            } else if (!client.canRecord()) {
+//                cerr << "Client should be able to record" << endl;
+//                failed++;
+
+            if (!client.record(MAX_SECONDS, onRecordFinish)) {
                 cerr << "Failed to start recording" << endl;
                 failed++;
             }
