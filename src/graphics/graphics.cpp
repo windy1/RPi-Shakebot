@@ -3,8 +3,8 @@
 #include "graphics.h"
 #include "../audio/record.h"
 #include "../app.h"
-#include <iostream>
 #include "../Shakebot.h"
+#include "../audio/AudioClient.h"
 
 using namespace std;
 
@@ -27,7 +27,7 @@ namespace sb {
         window.setKeyRepeatEnabled(KEY_REPEAT);
     }
 
-    void onRecordFinished(const AudioData *data) {
+    void onRecordFinished(AudioData *data) {
         cout << "onRecordFinished" << endl;
         sb::getBot()->interpret(data);
     }
@@ -39,10 +39,15 @@ namespace sb {
                 case sf::Event::Closed:
                     window.close();
                     break;
-                case sf::Event::MouseButtonPressed:
+                case sf::Event::MouseButtonPressed: {
                     //sb::getBot()->say("Hello, world!");
-                    startRecording(onRecordFinished);
+                    //startRecording(onRecordFinished);
+                    AudioClient *audio = sb::getAudioClient();
+                    if (!audio->isOpened()) {
+                        audio->record(MAX_SECONDS, onRecordFinished);
+                    }
                     break;
+                }
                 default:
                     break;
             }

@@ -30,10 +30,14 @@ namespace sb {
     }
 
     bool RestClient::init() {
-//        if (this) {
-//            cerr << "Client already initialized" << endl;
-//            return false;
-//        }
+        if (response.data != NULL) {
+            cerr << "Response data already allocated" << endl;
+            return false;
+        }
+        if (curl != NULL) {
+            cerr << "cURL already initialized" << endl;
+            return false;
+        }
 
         // allocate response
         response.data = (char*) malloc(1);
@@ -55,18 +59,6 @@ namespace sb {
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);           // set data object
         curl_easy_setopt(curl, CURLOPT_VERBOSE, verbose);               // set verbose mode
 
-        return true;
-    }
-
-    RestClient::operator bool() {
-        if (response.data != NULL) {
-            cerr << "Response data already allocated" << endl;
-            return false;
-        }
-        if (curl != NULL) {
-            cerr << "cURL already initialized" << endl;
-            return false;
-        }
         return true;
     }
 

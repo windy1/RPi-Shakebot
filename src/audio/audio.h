@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <portaudio.h>
 #include <iostream>
+#include <functional>
 
 #define MAX_SECONDS             5           // seconds to record
 #define CHANNEL_COUNT_CAPTURE   1           // hw limited to mono
@@ -21,28 +22,43 @@
 #define DEVICE_INDEX             2          // hardcoded for RPi
 #endif
 
-typedef int16_t Sample;
-
 using namespace std;
 
-/**
- * Raw PCM audio data. Each sample recorded represents an amplitude of the
- * sound wave received.
- */
-struct AudioData {
-    int     frameIndex;                 // incremented iterating sample data
-    int     numFrames;                  // the total amount of frames in the recording
-    Sample  *recordedSamples;           // block of memory containing samples
-};
+namespace sb {
 
-struct AudioDevice {
+    typedef int16_t Sample;
 
-    PaStreamParameters  params;
-    unsigned long       bufferSize      = 0;
-    int                 sampleRate      = SAMPLE_RATE;
+    struct AudioData;
+    class AudioClient;
 
-    friend ostream& operator<<(ostream &out, const AudioDevice &device);
+    /**
+     * Function type to receive recorded audio data.
+     */
+    typedef std::function<void(AudioData *)> RecordCallback;
 
-};
+    /**
+     * Raw PCM audio data. Each sample recorded represents an amplitude of the
+     * sound wave received.
+     */
+    struct AudioData {
+        int frameIndex;                     // incremented iterating sample data
+        int numFrames;                      // the total amount of frames in the recording
+        Sample *recordedSamples = NULL;     // block of memory containing samples
+        RecordCallback callback = NULL;
+    };
+
+    struct AudioDevice {
+
+        PaStreamParameters params;
+        unsigned long bufferSize = 0;
+        int sampleRate = SAMPLE_RATE;
+
+        friend ostream &operator<<(ostream &out, const AudioDevice &device);
+
+    };
+
+    AudioClient* initAudio();
+
+}
 
 #endif //SHAKESPEARE_AUDIO_H_H

@@ -6,8 +6,9 @@
 #include "graphics/graphics.h"
 #include "cmd/Command.h"
 
-sb::Shakebot bot;
-bool running = true;
+sb::Shakebot    bot;
+sb::AudioClient *audio  = NULL;
+bool            running = true;
 
 int main(int argc, char *argv[]) {
     srand((unsigned) time(NULL));
@@ -36,8 +37,17 @@ int main(int argc, char *argv[]) {
     sb::RenderShakebot *render = bot.getRender();
     render->scale(scale);
     render->move(offset);
+
     sb::startSpeech();
+
     sb::Command::loadLanguage();
+
+    audio = sb::initAudio();
+    if (audio == NULL) {
+        cerr << "Could not initialize audio client" << endl;
+        return 1;
+    }
+
     cout << "[running]" << endl;
 
     sf::RenderWindow *window = sb::getWindow();
@@ -60,6 +70,10 @@ namespace sb {
 
     Shakebot* getBot() {
         return &bot;
+    }
+
+    AudioClient* getAudioClient() {
+        return audio;
     }
 
     bool isRunning() {

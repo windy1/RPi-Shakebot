@@ -12,7 +12,7 @@ using namespace std;
 namespace sb {
 
     static bool recordFinished = false;
-    static void onRecordFinish(const AudioData* data);
+    static void onRecordFinish(AudioData* data);
 
     // Shakebot.h
     int testCountSyllables();
@@ -97,6 +97,8 @@ namespace sb {
         return failed;
     }
 
+    AudioClient client;
+
     int testPortAudio() {
         cout << "**** testPortAudio() ****" << endl;
 
@@ -109,7 +111,6 @@ namespace sb {
 //        }
 //        while (!recordFinished);
 
-        AudioClient client;
         if (!client.init()) {
             cerr << "Could not initialize client" << endl;
             failed++;
@@ -122,25 +123,41 @@ namespace sb {
             device->params.sampleFormat = SAMPLE_FORMAT;
             device->bufferSize = BUFFER_SIZE_CAPTURE;
             cout << *device << endl;
-            if (isActive()) {
+            if (client.isOpened()) {
                 cerr << "Client should not be active yet" << endl;
                 failed++;
             } else if (!client.canRecord()) {
                 cerr << "Client should be able to record" << endl;
                 failed++;
-            } else if (!client.record(MAX_SECONDS)) {
+            } else if (!client.record(MAX_SECONDS, onRecordFinish)) {
                 cerr << "Failed to start recording" << endl;
                 failed++;
             }
         }
+        while (!recordFinished);
 
         cout << "Done." << endl;
         return failed;
     }
 
-    void onRecordFinish(const AudioData *data) {
+    void onRecordFinish(AudioData *data) {
         cout << "- Finished recording" << endl;
-        playAudio(data);
+        if (!client.setPlaybackDevice(DEVICE_INDEX)) {
+            cerr << "Could not initialize playback device" << endl;
+            return;
+        }
+
+        AudioDevice *device = client.getPlaybackDevice();
+        device->params.channelCount = CHANNEL_COUNT_PLAYBACK;
+        device->params.sampleFormat = SAMPLE_FORMAT;
+        device->bufferSize = BUFFER_SIZE_CAPTURE;
+        cout << *device << endl;
+        if (!client.play(*data)) {
+            cerr << "Failed to playback" << endl;
+            return;
+        }
+
+        //playAudio(data);
         //encodeFlac(*data, "test/test.flac");
         json result;
         if (speech2text(data, result)) {

@@ -67,13 +67,6 @@ namespace sb {
         bool init();
 
         /**
-         * Returns true if this client has been initialized.
-         *
-         * @return true if initialized
-         */
-        operator bool();
-
-        /**
          * Performs a POST request.
          *
          * @param data Data to POST

@@ -13,6 +13,8 @@ namespace sb {
      */
     sb::Shakebot* getBot();
 
+    sb::AudioClient* getAudioClient();
+
     /**
      * Returns true if the application is running.
      *
