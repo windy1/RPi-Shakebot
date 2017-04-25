@@ -134,10 +134,11 @@ namespace sb {
         unsigned        numBytes    = numSamples * sizeof(Sample);
 
         cout << "Starting new recording" << endl;
-        cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
+        cout << "- Max Seconds: " << MAX_SECONDS << endl;
         cout << "- Channels: " << NUM_CHANNELS << endl;
         cout << "- Sample Rate: " << SAMPLE_RATE << " Hz" << endl;
-        cout << "- Buffer Size: " << BUFFER_SIZE << endl;
+        cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
+        cout << "- Buffer Size: " << CAPTURE_BUFFER_SIZE << endl;
         cout << "- Max Frames: " << numFrames << endl;
         cout << "- Max Samples: " << numSamples << endl;
         cout << "- Max bytes: " << numBytes << endl;
@@ -207,7 +208,7 @@ namespace sb {
                 &inputParams,
                 NULL,
                 SAMPLE_RATE,
-                BUFFER_SIZE,
+                CAPTURE_BUFFER_SIZE,
                 paClipOff,
                 recordCallback,
                 &data);
@@ -301,6 +302,10 @@ namespace sb {
 
         cout << "Playing back recording" << endl;
         cout << "- Frames: " << data.numFrames << endl;
+        cout << "- Channels: " << NUM_CHANNELS << endl;
+        cout << "- Sample Rate: " << SAMPLE_RATE << " Hz" << endl;
+        cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
+        cout << "- Buffer Size: " << CAPTURE_BUFFER_SIZE << endl;
 
         PaStreamParameters outputParams;
         if (DEVICE_INDEX == -1) {
@@ -312,21 +317,26 @@ namespace sb {
             cerr << "No default output device" << endl;
             return streamAbort(err, data);
         }
+        const PaDeviceInfo *info = Pa_GetDeviceInfo(outputParams.device);
+
+        cout << "Using Device" << endl;
+        cout << "- Name: " << info->name << endl;
+        cout << "- Max Input Channels: " << info->maxInputChannels << endl;
+        cout << "- Max Output Channels: " << info->maxOutputChannels << endl;
+        cout << "- Index: " << outputParams.device << endl;
+        cout << "- Suggested Latency: " << outputParams.suggestedLatency << endl;
+
         outputParams.channelCount = NUM_CHANNELS;
         outputParams.sampleFormat = SAMPLE_FORMAT;
-        outputParams.suggestedLatency = Pa_GetDeviceInfo(outputParams.device)->defaultLowOutputLatency;
+        outputParams.suggestedLatency = info->defaultLowOutputLatency;
         outputParams.hostApiSpecificStreamInfo = NULL;
-
-        cout << "Output Device" << endl;
-        cout << "- Device Index: " << outputParams.device << endl;
-        cout << "- Suggested Latency: " << outputParams.suggestedLatency << endl;
 
         err = Pa_OpenStream(
                 &stream,
                 NULL,
                 &outputParams,
                 SAMPLE_RATE,
-                BUFFER_SIZE,
+                PLAYBACK_BUFFER_SIZE,
                 paClipOff,
                 playCallback,
                 &data);
