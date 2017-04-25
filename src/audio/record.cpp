@@ -41,7 +41,7 @@ namespace sb {
         assert(audioData != NULL);
         // close and terminate pa
         cout << "closing stream" << endl;
-        PaError err = Pa_CloseStream(stream);
+        PaError err = /*Pa_CloseStream(stream)*/ paNoError; // FIXME: hangs on RPi
         cout << "stream closed" << endl;
         if (err != paNoError || (err = Pa_Terminate()) != paNoError) {
             cout << "error" << endl;
@@ -61,10 +61,11 @@ namespace sb {
                        const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
         // unused
-        //cout << ".";
         (void) outputBuffer;
         (void) timeInfo;
         (void) statusFlags;
+
+        //cout << ".";
 
         AudioData *data = (AudioData*) userData;
         const Sample *in = (const Sample*) inputBuffer;
@@ -78,12 +79,12 @@ namespace sb {
             cout << data->frameIndex << endl;
             cout << "Active recording stream interrupted ";
             cout << "(frame " << to_string(data->frameIndex) << "/";
-            cout << to_string(data->maxFrameIndex) << ")" << endl;
+            cout << to_string(data->numFrames) << ")" << endl;
             interrupt = false;
             return paComplete;
         }
 
-        unsigned long framesLeft = (unsigned long) (data->maxFrameIndex - data->frameIndex);
+        unsigned long framesLeft = (unsigned long) (data->numFrames - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             // write the rest of the frames
             frames = framesLeft;
@@ -130,7 +131,7 @@ namespace sb {
         PaError         err         = paNoError;
         int             numFrames   = MAX_SECONDS * SAMPLE_RATE;
         int             numSamples  = numFrames * NUM_CHANNELS;
-        unsigned int    numBytes    = numSamples * sizeof(Sample);
+        unsigned        numBytes    = numSamples * sizeof(Sample);
 
         cout << "Starting new recording" << endl;
         cout << "- Sample Size: " << sizeof(Sample) << endl;
@@ -140,7 +141,7 @@ namespace sb {
 
         // initialize data buffer
         data = {};
-        data.maxFrameIndex = numFrames;
+        data.numFrames = numFrames;
         data.frameIndex = 0;
         data.recordedSamples = (Sample*) malloc(numBytes);
         cout << &data.recordedSamples << endl;
@@ -254,7 +255,7 @@ namespace sb {
         Sample *out = (Sample*) outputBuffer;
         int finished;
 
-        unsigned int framesLeft = (unsigned int) (data->maxFrameIndex - data->frameIndex);
+        unsigned int framesLeft = (unsigned int) (data->numFrames - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             int i = 0;
             for (i = 0; i < framesLeft; i++) {
@@ -286,8 +287,8 @@ namespace sb {
     }
 
     bool playAudio(const AudioData *audioData) {
-        AudioData data = *audioData;
         // note: for testing purposes only
+        AudioData data = *audioData;
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             return streamAbort(err, data);
@@ -296,7 +297,7 @@ namespace sb {
         data.frameIndex = 0;
 
         cout << "Playing back recording" << endl;
-        cout << "- Frames: " << data.maxFrameIndex << endl;
+        cout << "- Frames: " << data.numFrames << endl;
 
         PaStreamParameters outputParams;
         if (DEVICE_INDEX == -1) {

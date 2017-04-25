@@ -7,9 +7,9 @@
 namespace sb {
 
     /**
-     * Returns the Shakebot instance.
+     * Returns the bot instance.
      *
-     * @return Shakebot instance
+     * @return bot instance
      */
     sb::Shakebot* getBot();
 

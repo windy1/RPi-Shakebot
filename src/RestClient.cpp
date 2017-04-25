@@ -8,6 +8,7 @@ namespace sb {
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp);
 
     RestClient::~RestClient() {
+        // cleanup
         if (curl) {
             curl_easy_cleanup(curl);
         }
@@ -29,13 +30,8 @@ namespace sb {
     }
 
     bool RestClient::init() {
-        // preconditions
-        if (response.data) {
-            cerr << "Response data already allocated" << endl;
-            return false;
-        }
-        if (curl) {
-            cerr << "cURL already initialized" << endl;
+        if (this) {
+            cerr << "Client already initialized" << endl;
             return false;
         }
 
@@ -54,18 +50,29 @@ namespace sb {
             return false;
         }
 
-        // configure curl
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, requestHeaders);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponse);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, verbose);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, requestHeaders);     // add request headers
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponse);   // set response callback
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);           // set data object
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, verbose);               // set verbose mode
 
+        return true;
+    }
+
+    RestClient::operator bool() {
+        if (response.data != NULL) {
+            cerr << "Response data already allocated" << endl;
+            return false;
+        }
+        if (curl != NULL) {
+            cerr << "cURL already initialized" << endl;
+            return false;
+        }
         return true;
     }
 
     RestResponse* RestClient::post(string data, string url, string resultType) {
         assert(curl != NULL);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str()); // set post data
         return perform(url, true, resultType);
     }
 
@@ -76,8 +83,8 @@ namespace sb {
     RestResponse* RestClient::perform(string url, bool post, string resultType) {
         assert(curl != NULL);
 
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_POST, post);
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());   // set request url
+        curl_easy_setopt(curl, CURLOPT_POST, post);         // set request method
 
         // perform curl
         response.code = curl_easy_perform(curl);
@@ -107,6 +114,7 @@ namespace sb {
     }
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {
+        // reallocate data block while reading
         size_t realSize = size * nmemb;
         RestResponse *response = (RestResponse*) userp;
         response->data = (char*) realloc(response->data, response->size + realSize + 1);

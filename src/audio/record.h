@@ -7,14 +7,10 @@
 
 namespace sb {
 
-    typedef std::function<void(const AudioData*)> RecordCallback;
-
     /**
-     * Plays the specified AudioData to the default output device.
-     *
-     * @param data Data to play
+     * Function type to receive recorded audio data.
      */
-    bool playAudio(const AudioData *data);
+    typedef std::function<void(const AudioData*)> RecordCallback;
 
     /**
      * Returns true if audio is currently being recorded.
@@ -35,6 +31,13 @@ namespace sb {
      * Stops recording audio.
      */
     bool stopRecording();
+
+    /**
+     * Plays the specified AudioData to the default output device.
+     *
+     * @param data Data to play
+     */
+    bool playAudio(const AudioData *data);
 
 }
 

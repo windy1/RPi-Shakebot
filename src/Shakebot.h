@@ -41,8 +41,18 @@ namespace sb {
 
         Shakebot();
 
+        /**
+         * Returns true if the bot's "mouth" is opened.
+         *
+         * @return true if mouth opened
+         */
         bool isMouthOpened();
 
+        /**
+         * Returns graphics component for bot
+         *
+         * @return graphics component
+         */
         RenderShakebot* getRender();
 
         /**
@@ -57,6 +67,12 @@ namespace sb {
          */
         void update();
 
+        /**
+         * Prompts the bot to interpret and responded a recorded voice command.
+         *
+         * @param data recorded audio data
+         * @return true if successful
+         */
         bool interpret(const AudioData *data);
 
     };
