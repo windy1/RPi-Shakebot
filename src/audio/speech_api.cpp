@@ -25,7 +25,7 @@ namespace sb {
 
     bool speech2text(const AudioData *data, json &result) {
         // copy sample data -- TODO: necessary?
-        size_t numSamples = (size_t) (data->numFrames * NUM_CHANNELS);
+        size_t numSamples = (size_t) (data->numFrames * CHANNEL_COUNT_CAPTURE);
         size_t numBytes = numSamples * sizeof(Sample);
         char *buffer = (char*) malloc(numBytes);
         if (buffer == NULL) {

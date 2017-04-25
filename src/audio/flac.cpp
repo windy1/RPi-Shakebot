@@ -27,9 +27,9 @@ namespace sb {
         FLAC__StreamMetadata *metadata[2];
         FLAC__StreamMetadata_VorbisComment_Entry entry;
         uint32_t sampleRate = SAMPLE_RATE;
-        uint32_t channels = NUM_CHANNELS;
+        uint32_t channels = CHANNEL_COUNT_CAPTURE;
         uint32_t bitsPerSample = sizeof(Sample) * 8;
-        totalSamples = (uint32_t) data.numFrames * NUM_CHANNELS;
+        totalSamples = (uint32_t) data.numFrames * CHANNEL_COUNT_CAPTURE;
 
         time_t tm = time(NULL);
         int year = localtime(&tm)->tm_year + 1900;

@@ -70,7 +70,7 @@ namespace sb {
         AudioData *data = (AudioData*) userData;
         const Sample *in = (const Sample*) inputBuffer;
         // sampleData starts at current frame
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
         long frames;
         int finished;
 
@@ -100,14 +100,14 @@ namespace sb {
             // no new data
             for (long i = 0; i < frames; i++) {
                 *sampleData++ = SAMPLE_SILENCE;
-                if (NUM_CHANNELS == 2) {
+                if (CHANNEL_COUNT_CAPTURE == 2) {
                     *sampleData++ = SAMPLE_SILENCE;
                 }
             }
         } else {
             for (long i = 0; i < frames; i++) {
                 *sampleData++ = *in++;
-                if (NUM_CHANNELS == 2) {
+                if (CHANNEL_COUNT_CAPTURE == 2) {
                     *sampleData++ = *in++;
                 }
             }
@@ -130,15 +130,15 @@ namespace sb {
 
         PaError         err         = paNoError;
         int             numFrames   = MAX_SECONDS * SAMPLE_RATE;
-        int             numSamples  = numFrames * NUM_CHANNELS;
+        int             numSamples  = numFrames * CHANNEL_COUNT_CAPTURE;
         unsigned        numBytes    = numSamples * sizeof(Sample);
 
         cout << "Starting new recording" << endl;
         cout << "- Max Seconds: " << MAX_SECONDS << endl;
-        cout << "- Channels: " << NUM_CHANNELS << endl;
+        cout << "- Channels: " << CHANNEL_COUNT_CAPTURE << endl;
         cout << "- Sample Rate: " << SAMPLE_RATE << " Hz" << endl;
         cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
-        cout << "- Buffer Size: " << CAPTURE_BUFFER_SIZE << endl;
+        cout << "- Buffer Size: " << BUFFER_SIZE_CAPTURE << endl;
         cout << "- Max Frames: " << numFrames << endl;
         cout << "- Max Samples: " << numSamples << endl;
         cout << "- Max bytes: " << numBytes << endl;
@@ -191,7 +191,7 @@ namespace sb {
         cout << "- Max Output Channels: " << info->maxOutputChannels << endl;
         cout << "- Index: " << inputParams.device << endl;
 
-        inputParams.channelCount = NUM_CHANNELS;
+        inputParams.channelCount = CHANNEL_COUNT_CAPTURE;
         inputParams.sampleFormat = SAMPLE_FORMAT;
         inputParams.suggestedLatency = info->defaultLowInputLatency;
         inputParams.hostApiSpecificStreamInfo = NULL;
@@ -208,7 +208,7 @@ namespace sb {
                 &inputParams,
                 NULL,
                 SAMPLE_RATE,
-                CAPTURE_BUFFER_SIZE,
+                BUFFER_SIZE_CAPTURE,
                 paClipOff,
                 recordCallback,
                 &data);
@@ -255,7 +255,7 @@ namespace sb {
 
         // write data to output device
         AudioData *data = (AudioData*) userData;
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * NUM_CHANNELS];
+        Sample *sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_PLAYBACK];
         Sample *out = (Sample*) outputBuffer;
         int finished;
 
@@ -264,13 +264,13 @@ namespace sb {
             int i = 0;
             for (i = 0; i < framesLeft; i++) {
                 *out++ = *sampleData++;
-                if (NUM_CHANNELS == 2) {
+                if (CHANNEL_COUNT_PLAYBACK == 2) {
                     *out++ = *sampleData++;
                 }
             }
             for (; i < framesPerBuffer; i++) {
                 *out++ = 0;
-                if (NUM_CHANNELS == 2) {
+                if (CHANNEL_COUNT_PLAYBACK == 2) {
                     *out++ = 0;
                 }
             }
@@ -279,7 +279,7 @@ namespace sb {
         } else {
             for (int i = 0; i < framesPerBuffer; i++) {
                 *out++ = *sampleData++;
-                if (NUM_CHANNELS == 2) {
+                if (CHANNEL_COUNT_PLAYBACK == 2) {
                     *out++ = *sampleData++;
                 }
             }
@@ -302,10 +302,10 @@ namespace sb {
 
         cout << "Playing back recording" << endl;
         cout << "- Frames: " << data.numFrames << endl;
-        cout << "- Channels: " << NUM_CHANNELS << endl;
+        cout << "- Channels: " << CHANNEL_COUNT_PLAYBACK << endl;
         cout << "- Sample Rate: " << SAMPLE_RATE << " Hz" << endl;
         cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
-        cout << "- Buffer Size: " << CAPTURE_BUFFER_SIZE << endl;
+        cout << "- Buffer Size: " << BUFFER_SIZE_PLAYBACK << endl;
 
         PaStreamParameters outputParams;
         if (DEVICE_INDEX == -1) {
@@ -326,7 +326,7 @@ namespace sb {
         cout << "- Index: " << outputParams.device << endl;
         cout << "- Suggested Latency: " << outputParams.suggestedLatency << endl;
 
-        outputParams.channelCount = NUM_CHANNELS;
+        outputParams.channelCount = CHANNEL_COUNT_PLAYBACK;
         outputParams.sampleFormat = SAMPLE_FORMAT;
         outputParams.suggestedLatency = info->defaultLowOutputLatency;
         outputParams.hostApiSpecificStreamInfo = NULL;
@@ -336,7 +336,7 @@ namespace sb {
                 NULL,
                 &outputParams,
                 SAMPLE_RATE,
-                PLAYBACK_BUFFER_SIZE,
+                BUFFER_SIZE_PLAYBACK,
                 paClipOff,
                 playCallback,
                 &data);
