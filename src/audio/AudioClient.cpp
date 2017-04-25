@@ -225,11 +225,7 @@ namespace sb {
     }
 
     bool AudioClient::isOpened() {
-        bool result = initialized;
-#ifdef __APPLE__
-        result &= stream != NULL && Pa_IsStreamActive(stream) == 1;
-#endif
-        return result;
+        return initialized && stream != NULL && Pa_IsStreamActive(stream) == 1;
     }
 
     bool AudioClient::close() {
@@ -330,8 +326,6 @@ namespace sb {
             cerr << "Client not initialized" << endl;
             return false;
         }
-
-        //Pa_Initialize(); // TODO: why is this needed
 
         PaStreamParameters params;
         if (index == -1) {
@@ -435,10 +429,10 @@ namespace sb {
             cerr << "Client not initialized" << endl;
             return false;
         }
-        if (isOpened()) {
-            cerr << "Stream is active" << endl;
-            return false;
-        }
+//        if (isOpened()) {
+//            cerr << "Stream is active" << endl;
+//            return false;
+//        }
         if (captureDevice.bufferSize <= 0) {
             cerr << "Invalid buffer size" << endl;
             return false;
