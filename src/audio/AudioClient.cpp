@@ -3,6 +3,8 @@
 
 namespace sb {
 
+    /* Static C-Style callbacks */
+
     void paErr(PaError err) {
         cerr << "An error occurred while using the portaudio stream" << endl;
         cerr << "Error number: " << err << endl;
@@ -21,7 +23,8 @@ namespace sb {
         }
     }
 
-    void onStreamFinished2(void *audioData) {
+    void onStreamFinished(void *audioData) {
+        // called after a playback/capture stream is stopped
         // close stream and pass callback recorded data
         cout << "Stream complete." << endl;
         assert(audioData != NULL);
@@ -37,34 +40,41 @@ namespace sb {
     int captureSamples(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                        const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
+
+        // Called periodically while an input stream is active. It is important
+        // that nothing particularly time consuming happens here.
+
         // unused
         (void) outputBuffer;
         (void) timeInfo;
         (void) statusFlags;
 
-        cout << ".";
+        cout << "."; // TODO: remove
 
-        AudioData *data = (AudioData*) userData;
-        const Sample *in = (const Sample*) inputBuffer;
-        // sampleData starts at current frame
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
-        long frames;
-        int finished;
+        AudioData       *data;                              // the data buffer we're writing to
+        const Sample    *in;                                // the incoming samples
+        Sample          *sampleData;                        // the slice of memory to write incoming data to
+        long            frames;                             // amount of frames to process this period
+        int             state;                              // the state of the stream (continue/complete)
+
+        data = (AudioData*) userData;
+        in = (const Sample*) inputBuffer;
+        sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
 
         unsigned long framesLeft = (unsigned long) (data->numFrames - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             // write the rest of the frames
             frames = framesLeft;
-            finished = paComplete;
+            state = paComplete;
         } else {
             // write the standard amount of frames
             frames = framesPerBuffer;
-            finished = paContinue;
+            state = paContinue;
         }
 
         // take samples
         if (inputBuffer == NULL) {
-            // no new data
+            // no new data, sample silence
             for (long i = 0; i < frames; i++) {
                 *sampleData++ = SAMPLE_SILENCE;
                 if (CHANNEL_COUNT_CAPTURE == 2) {
@@ -81,7 +91,7 @@ namespace sb {
         }
 
         data->frameIndex += frames;
-        return finished;
+        return state;
     }
 
     int playbackSamples(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
@@ -92,11 +102,16 @@ namespace sb {
         (void) timeInfo;
         (void) statusFlags;
 
-        // write data to output device
-        AudioData *data = (AudioData*) userData;
-        Sample *sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
-        Sample *out = (Sample*) outputBuffer;
-        int finished;
+        AudioData   *data;                          // the sample data we are reading from
+        Sample      *sampleData;                    // the slice of samples we will write this period
+        Sample      *out = (Sample*) outputBuffer;  // the space to write sample to output device
+        int         state;                          // the completion state of the stream
+
+        data = (AudioData*) userData;
+        sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
+
+        // Note: The following has been hardcoded to write 1-channel input
+        // (mono) to 2-channel output (stereo).
 
         unsigned int framesLeft = (unsigned int) (data->numFrames - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
@@ -117,7 +132,7 @@ namespace sb {
                 }
             }
             data->frameIndex += framesLeft;
-            finished = paComplete;
+            state = paComplete;
         } else {
             for (int i = 0; i < framesPerBuffer; i++) {
                 Sample sample = *sampleData++;
@@ -129,10 +144,10 @@ namespace sb {
                 }
             }
             data->frameIndex += framesPerBuffer;
-            finished = paContinue;
+            state = paContinue;
         }
 
-        return finished;
+        return state;
     }
 
     PaError openInputStream(PaStream **stream, AudioDevice &captureDevice, AudioData &data) {
@@ -158,6 +173,9 @@ namespace sb {
                 playbackSamples,
                 &data);
     }
+
+
+    /* PortAudio wrapped in a more C++ friendly way */
 
     AudioClient::~AudioClient() {
         // cleanup
@@ -302,7 +320,7 @@ namespace sb {
         }
 
         // set callback for when the stream has been stopped
-        err = Pa_SetStreamFinishedCallback(stream, onStreamFinished2);
+        err = Pa_SetStreamFinishedCallback(stream, onStreamFinished);
         if (err != paNoError) {
             paErr(err);
             return abortRecord(); // free sample data and abort stream

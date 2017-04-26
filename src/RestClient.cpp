@@ -26,6 +26,7 @@ namespace sb {
     }
 
     void RestClient::addHeader(string header) {
+        assert(!header.empty());
         requestHeaders = curl_slist_append(requestHeaders, header.c_str());
     }
 
@@ -74,6 +75,7 @@ namespace sb {
 
     RestResponse* RestClient::perform(string url, bool post, string resultType) {
         assert(curl != NULL);
+        assert(!url.empty());
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());   // set request url
         curl_easy_setopt(curl, CURLOPT_POST, post);         // set request method
