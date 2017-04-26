@@ -97,7 +97,7 @@ namespace sb {
     }
 
     AudioClient client;
-    AudioData *in = NULL;
+    const AudioData *in = NULL;
 
     int testPortAudio() {
         cout << "**** testPortAudio() ****" << endl;
@@ -125,14 +125,13 @@ namespace sb {
 
         while (!recordFinished);
 
-        if (!client.setPlaybackDevice(DEVICE_INDEX)) {
-            cerr << "Could not initialize playback device" << endl;
-            return;
-        }
-
         if (!client.close()) {
             cerr << "Failed to close stream" << endl;
             failed++;
+        }
+
+        if (!client.setPlaybackDevice(DEVICE_INDEX)) {
+            cerr << "Could not initialize playback device" << endl;
         }
 
         AudioDevice *device = client.getPlaybackDevice();
@@ -142,11 +141,10 @@ namespace sb {
         cout << *device << endl;
         if (!client.play()) {
             cerr << "Failed to playback" << endl;
-            return;
         }
 
         json result;
-        if (speech2text(client.data(), result)) {
+        if (speech2text(in, result)) {
             cout << result.dump(4) << endl;
         }
 
