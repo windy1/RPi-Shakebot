@@ -1,4 +1,7 @@
 #include "AudioClient.h"
+#if !__APPLE__
+#include <string.h>
+#endif
 
 namespace sb {
 

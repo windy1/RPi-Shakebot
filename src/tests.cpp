@@ -124,16 +124,17 @@ namespace sb {
 
         while (!recordFinished);
 
+        if (!client.close()) {
+            cerr << "Failed to close stream" << endl;
+            failed++;
+        }
+
         cout << "Done." << endl;
         return failed;
     }
 
     void onRecordFinish() {
         cout << "- Finished recording" << endl;
-        if (!client.close()) {
-            cerr << "Failed to close stream" << endl;
-            return;
-        }
         if (!client.setPlaybackDevice(DEVICE_INDEX)) {
             cerr << "Could not initialize playback device" << endl;
             return;
