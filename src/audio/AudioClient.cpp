@@ -23,6 +23,17 @@ namespace sb {
         }
     }
 
+    void printHostApis() {
+        cout << "Host APIs" << endl;
+        for (int i = 0; i < Pa_GetHostApiCount(); i++) {
+            const PaHostApiInfo *info = Pa_GetHostApiInfo(i);
+            cout << "- " << info->name << endl;
+            cout << "    Device Count: " << info->deviceCount << endl;
+            cout << "    Default Input Device: " << info->defaultInputDevice << endl;
+            cout << "    Default Output Device: " << info->defaultOutputDevice << endl;
+        }
+    }
+
     int captureSamples(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                        const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
@@ -205,7 +216,9 @@ namespace sb {
         stream = NULL;
         initialized = true;
 
-        printDevices(); // debug
+        // debug
+        printDevices();
+        printHostApis();
 
         return initialized;
     }
@@ -279,6 +292,7 @@ namespace sb {
         // the RPi doesn't seem to like this for some reason
         PaError err = paNoError;
         if (!isStreamStopped()) {
+            cout << "Stopping stream" << endl;
             err = Pa_StopStream(stream);
             cout << "close.Stopped: " << boolalpha << isStreamStopped() << endl;
             if (err != paNoError) {
@@ -287,6 +301,7 @@ namespace sb {
                 return false;
             }
         }
+        cout << "Closing stream" << endl;
         err = Pa_CloseStream(stream);
         if (err != paNoError) {
             paErr(err);
