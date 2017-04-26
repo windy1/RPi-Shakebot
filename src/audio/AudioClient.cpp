@@ -23,20 +23,6 @@ namespace sb {
         }
     }
 
-    void onStreamFinished(void *audioData) {
-        // called after a playback/capture stream is stopped
-        // close stream and pass callback recorded data
-        cout << "Stream complete." << endl;
-        assert(audioData != NULL);
-        AudioData *data = (AudioData*) audioData;
-        data->callback(data);
-        // free sample memory
-        if (data->recordedSamples != NULL) {
-            free(data->recordedSamples);
-            data->recordedSamples = NULL;
-        }
-    }
-
     int captureSamples(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                        const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                        void *userData) {
@@ -150,6 +136,21 @@ namespace sb {
         return state;
     }
 
+    void onStreamFinished(void *audioData) {
+        // called after a playback/capture stream is stopped
+        // close stream and pass callback recorded data
+        cout << "Stream complete." << endl;
+        assert(audioData != NULL);
+        AudioData *data = (AudioData*) audioData;
+        data->callback(data);
+        // free sample memory
+        if (data->recordedSamples != NULL) {
+            free(data->recordedSamples);
+            data->recordedSamples = NULL;
+        }
+    }
+
+
     PaError openInputStream(PaStream **stream, AudioDevice &captureDevice, AudioData &data) {
         return Pa_OpenStream(
                 stream,                      //
@@ -179,7 +180,7 @@ namespace sb {
 
     AudioClient::~AudioClient() {
         // cleanup
-        if (isOpened()) {
+        if (isStreamActive()) {
             Pa_AbortStream(stream);
         }
         resetData();
@@ -266,19 +267,32 @@ namespace sb {
         return &captureDevice;
     }
 
-    bool AudioClient::isOpened() {
-        return initialized && stream != NULL && Pa_IsStreamActive(stream) == 1;
+    bool AudioClient::isStreamActive() {
+        return stream != NULL && Pa_IsStreamActive(stream) == 1;
+    }
+
+    bool AudioClient::isStreamStopped() {
+        return stream == NULL || Pa_IsStreamStopped(stream) == 1;
     }
 
     bool AudioClient::close() {
         // the RPi doesn't seem to like this for some reason
-#ifdef __APPLE__
-        PaError err = Pa_CloseStream(stream);
+        PaError err = paNoError;
+        if (!isStreamStopped()) {
+            err = Pa_StopStream(stream);
+            cout << "close.Stopped: " << boolalpha << isStreamStopped() << endl;
+            if (err != paNoError) {
+                cerr << "Could not stop stream" << endl;
+                paErr(err);
+                return false;
+            }
+        }
+        err = Pa_CloseStream(stream);
         if (err != paNoError) {
             paErr(err);
             return false;
         }
-#endif
+        stream = NULL;
         return true;
     }
 
@@ -471,10 +485,10 @@ namespace sb {
             cerr << "Client not initialized" << endl;
             return false;
         }
-//        if (isOpened()) {
-//            cerr << "Stream is active" << endl;
-//            return false;
-//        }
+        if (isStreamActive()) {
+            cerr << "Stream is active" << endl;
+            return false;
+        }
         if (captureDevice.bufferSize <= 0) {
             cerr << "Invalid buffer size" << endl;
             return false;

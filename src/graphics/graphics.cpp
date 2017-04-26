@@ -29,16 +29,14 @@ namespace sb {
 
     void onRecordFinished(AudioData *data) {
         cout << "onRecordFinished" << endl;
-        sb::getBot()->interpret(data);
         AudioClient *audio = sb::getAudioClient();
+        cout << "Active: " << boolalpha << audio->isStreamActive() << endl;
+        cout << "Stopped: " << boolalpha << audio->isStreamStopped() << endl;
+        sb::getBot()->interpret(data);
         audio->close();
-        while (true) {
-            cout << "Resetting audio..." << endl;
-            if (!sb::resetAudio()) {
-                cerr << "Could not re-init audio" << endl;
-            }
-            usleep(5000000);
-        }
+//        if (!sb::resetAudio()) {
+//            cerr << "Could not re-init audio" << endl;
+//        }
     }
 
     void pollInput() {
@@ -52,9 +50,10 @@ namespace sb {
                     //sb::getBot()->say("Hello, world!");
                     //startRecording(onRecordFinished);
                     AudioClient *audio = sb::getAudioClient();
-                    if (!audio->isOpened()) {
-                        audio->record(MAX_SECONDS, onRecordFinished);
+                    if (audio->isStreamActive()) {
+                        audio->close();
                     }
+                    audio->record(MAX_SECONDS, onRecordFinished);
                     break;
                 }
                 default:

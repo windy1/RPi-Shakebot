@@ -66,11 +66,18 @@ namespace sb {
         AudioDevice* getCaptureDevice();
 
         /**
-         * Returns true if this client currently has a stream opened.
+         * Returns true if this client currently has a stream active.
          *
          * @return True if opened
          */
-        bool isOpened();
+        bool isStreamActive();
+
+        /**
+         * Returns true if the stream is stopped.
+         *
+         * @return True if stopped
+         */
+        bool isStreamStopped();
 
         /**
          * Attempts to close the active stream.

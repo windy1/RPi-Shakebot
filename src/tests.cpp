@@ -122,7 +122,7 @@ namespace sb {
             device->params.sampleFormat = SAMPLE_FORMAT;
             device->bufferSize = BUFFER_SIZE_CAPTURE;
             cout << *device << endl;
-//            if (client.isOpened()) {
+//            if (client.isStreamActive()) {
 //                cerr << "Client should not be active yet" << endl;
 //                failed++;
 //            } else if (!client.canRecord()) {
