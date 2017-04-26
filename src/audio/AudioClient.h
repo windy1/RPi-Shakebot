@@ -32,6 +32,13 @@ namespace sb {
         bool init();
 
         /**
+         * Resets and reinitializes the client and PortAudio.
+         *
+         * @return True if successful
+         */
+        bool reset();
+
+        /**
          * Sets the device to use for audio capture. This method will use the
          * default device if -1 is used for the index. Returns true if
          * successful.

@@ -28,8 +28,12 @@ namespace sb {
 
     void onRecordFinished(AudioData *data) {
         cout << "onRecordFinished" << endl;
-        sb::getAudioClient()->close();
         sb::getBot()->interpret(data);
+        AudioClient *audio = sb::getAudioClient();
+        audio->close();
+        if (!audio->reset()) {
+            cerr << "Could not reset audio client" << endl;
+        }
     }
 
     void pollInput() {

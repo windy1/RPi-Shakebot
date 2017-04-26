@@ -191,7 +191,7 @@ namespace sb {
     bool AudioClient::init() {
         // initialize pa
         if (initialized) {
-            cerr << "Recorder already initialized" << endl;
+            cerr << "Client already initialized" << endl;
             return initialized;
         }
         PaError err = Pa_Initialize();
@@ -204,6 +204,20 @@ namespace sb {
 
         initialized = true;
         return initialized;
+    }
+
+    bool AudioClient::reset() {
+        if (!initialized) {
+            cerr << "Client not initialized" << endl;
+            return false;
+        }
+        PaError err = Pa_Terminate();
+        if (err != paNoError) {
+            cerr << "Could not terminate PA" << endl;
+            return false;
+        }
+        initialized = false;
+        return init();
     }
 
     bool AudioClient::setCaptureDevice(int index) {
