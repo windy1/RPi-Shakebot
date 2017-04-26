@@ -31,8 +31,11 @@ namespace sb {
         sb::getBot()->interpret(data);
         AudioClient *audio = sb::getAudioClient();
         audio->close();
-        if (!sb::resetAudio()) {
-            cerr << "Could not re-init audio" << endl;
+        while (true) {
+            if (!sb::resetAudio()) {
+                cerr << "Could not re-init audio" << endl;
+            }
+            sleep(5);
         }
     }
 
