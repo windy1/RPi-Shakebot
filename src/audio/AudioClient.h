@@ -20,6 +20,8 @@ namespace sb {
 
         bool canOpen();
 
+        void resetData();
+
     public:
 
         ~AudioClient();

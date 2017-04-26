@@ -182,9 +182,7 @@ namespace sb {
         if (isOpened()) {
             Pa_AbortStream(stream);
         }
-        if (data.recordedSamples != NULL) {
-            free(data.recordedSamples);
-        }
+        resetData();
         Pa_Terminate();
     }
 
@@ -200,9 +198,14 @@ namespace sb {
             return initialized;
         }
 
+        resetData();
+        captureDevice = {};
+        playbackDevice = {};
+        stream = NULL;
+        initialized = true;
+
         printDevices(); // debug
 
-        initialized = true;
         return initialized;
     }
 
@@ -218,6 +221,13 @@ namespace sb {
         }
         initialized = false;
         return init();
+    }
+
+    void AudioClient::resetData() {
+        if (data.recordedSamples != NULL) {
+            free(data.recordedSamples);
+            data = {};
+        }
     }
 
     bool AudioClient::setCaptureDevice(int index) {

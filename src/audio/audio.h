@@ -59,6 +59,8 @@ namespace sb {
 
     AudioClient* initAudio();
 
+    bool resetAudio();
+
 }
 
 #endif //SHAKESPEARE_AUDIO_H_H
