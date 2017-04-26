@@ -1,0 +1,4 @@
+arecord -D plughw:1 --duration=5 --format S16_LE --rate 48000 -v -V mono testmic.wav
+aplay -v testmic.wav
+rm testmic.wav
+
