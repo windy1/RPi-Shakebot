@@ -32,6 +32,7 @@ namespace sb {
         AudioClient *audio = sb::getAudioClient();
         audio->close();
         while (true) {
+            cout << "Resetting audio..." << endl;
             if (!sb::resetAudio()) {
                 cerr << "Could not re-init audio" << endl;
             }
