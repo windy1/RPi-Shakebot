@@ -1,5 +1,6 @@
 #include <SFML/Config.hpp>
 #include <SFML/Window.hpp>
+#include <unistd.h>
 #include "graphics.h"
 #include "../app.h"
 #include "../Shakebot.h"
@@ -36,7 +37,7 @@ namespace sb {
             if (!sb::resetAudio()) {
                 cerr << "Could not re-init audio" << endl;
             }
-            sleep(5);
+            usleep(5000000);
         }
     }
 
