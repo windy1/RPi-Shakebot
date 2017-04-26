@@ -293,7 +293,11 @@ namespace sb {
         PaError err = paNoError;
         if (!isStreamStopped()) {
             cout << "Stopping stream" << endl;
-            err = Pa_StopStream(stream);
+            try {
+                err = Pa_StopStream(stream);
+            } catch (...) {
+                cerr << "PA threw an exception while stopping stream" << endl;
+            }
             cout << "close.Stopped: " << boolalpha << isStreamStopped() << endl;
             if (err != paNoError) {
                 cerr << "Could not stop stream" << endl;
