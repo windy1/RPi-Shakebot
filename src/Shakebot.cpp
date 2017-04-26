@@ -83,17 +83,20 @@ namespace sb {
         if (in != NULL) {
             if (!sb::getAudioClient()->close()) {
                 cerr << "Could not close audio stream" << endl;
+                in = NULL;
                 return;
             }
 
             json response;
             if (!speech2text(in, response)) {
                 cerr << "Could not retrieve voice translation" << endl;
+                in = NULL;
                 return;
             }
             cout << response.dump(4) << endl;
             if (response.empty()) {
                 cerr << "Empty response" << endl;
+                in = NULL;
                 return;
             }
 
@@ -106,6 +109,8 @@ namespace sb {
                     say(cmd->execute());
                 }
             }
+
+            in = NULL;
         }
     }
 

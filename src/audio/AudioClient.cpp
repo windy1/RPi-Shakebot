@@ -288,7 +288,6 @@ namespace sb {
 
     bool AudioClient::close() {
         // WARNING: DO NOT CALL FROM CALLBACK
-        // the RPi doesn't seem to like this for some reason
         PaError err = paNoError;
         if (!isStreamStopped()) {
             cout << "Stopping stream" << endl;
@@ -313,10 +312,6 @@ namespace sb {
     bool AudioClient::canRecord() {
         if (!canOpen()) {
             cerr << "Cannot open stream" << endl;
-            return false;
-        }
-        if (dat.recordedSamples != NULL) {
-            cerr << "Sample data already allocated" << endl;
             return false;
         }
         PaError err = Pa_IsFormatSupported(&captureDevice.params, NULL, captureDevice.sampleRate);
@@ -501,6 +496,10 @@ namespace sb {
         }
         if (isStreamActive()) {
             cerr << "Stream is active" << endl;
+            return false;
+        }
+        if (!isStreamStopped()) {
+            cerr << "Stream is not stopped" << endl;
             return false;
         }
         if (captureDevice.bufferSize <= 0) {
