@@ -37,6 +37,8 @@ namespace sb {
         promise<bool> voxPromise;
         future<bool> voxFuture;
 
+        const AudioData *in = NULL;
+
     public:
 
         Shakebot();
@@ -73,7 +75,7 @@ namespace sb {
          * @param data recorded audio data
          * @return true if successful
          */
-        bool interpret(const AudioData *data);
+        void interpret(const AudioData *data);
 
     };
 

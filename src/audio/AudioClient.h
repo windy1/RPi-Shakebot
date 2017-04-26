@@ -10,17 +10,14 @@ namespace sb {
 
     class AudioClient {
 
-        AudioData           data;
+        AudioData           dat;
         AudioDevice         captureDevice;
+        CaptureCallback     captureCallback;
         AudioDevice         playbackDevice;
         PaStream            *stream         = NULL;
         bool                initialized     = false;
 
-        bool abortRecord();
-
         bool canOpen();
-
-        void resetData();
 
     public:
 
@@ -39,6 +36,8 @@ namespace sb {
          * @return True if successful
          */
         bool reset();
+
+        const AudioData* data();
 
         /**
          * Sets the device to use for audio capture. This method will use the
@@ -64,6 +63,10 @@ namespace sb {
          * @return Capture device
          */
         AudioDevice* getCaptureDevice();
+
+        CaptureCallback getCaptureCallback() const;
+
+        void setCaptureCallback(CaptureCallback captureCallback);
 
         /**
          * Returns true if this client currently has a stream active.
@@ -102,7 +105,7 @@ namespace sb {
          * @param callback Callback to call
          * @return True if successful
          */
-        bool record(int seconds, RecordCallback callback);
+        bool record(int seconds);
 
         /**
          * Sets the device to use for audio playback. This method will use the
@@ -139,10 +142,10 @@ namespace sb {
         /**
          * Starts playback on the specified audio data.
          *
-         * @param data Data to play
+         * @param dat Data to play
          * @return True if successful
          */
-        bool play(AudioData &data);
+        bool play();
 
     };
 

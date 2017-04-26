@@ -12,9 +12,6 @@ namespace sb {
         if (curl) {
             curl_easy_cleanup(curl);
         }
-        if (response.data) {
-            free(response.data);
-        }
     }
 
     bool RestClient::isVerbose() const {
@@ -105,6 +102,22 @@ namespace sb {
     json RestResponse::asJson() {
         assert(data != NULL);
         return json::parse(data);
+    }
+
+    RestResponse::RestResponse() {
+    }
+
+    RestResponse::RestResponse(const RestResponse &response) {
+        code = response.code;
+        size = response.size;
+        data = (char*) malloc(size);
+        memcpy(data, response.data, size);
+    }
+
+    RestResponse::~RestResponse() {
+        if (data != NULL) {
+            free(data);
+        }
     }
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {

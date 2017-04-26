@@ -34,17 +34,31 @@ namespace sb {
     /**
      * Function type to receive recorded audio data.
      */
-    typedef std::function<void(AudioData *)> RecordCallback;
+    typedef std::function<void()> CaptureCallback;
 
     /**
      * Raw PCM audio data. Each sample recorded represents an amplitude of the
      * sound wave received.
      */
     struct AudioData {
+
         int frameIndex;                     // incremented iterating sample data
-        int numFrames;                      // the total amount of frames in the recording
+        int frameCount;                     // the total amount of frames in the recording
+        int captureChannels;                // the amount of channels the data was sampled with
         Sample *recordedSamples = NULL;     // block of memory containing samples
-        RecordCallback callback = NULL;
+        AudioClient *client     = NULL;     // reference to client
+
+        AudioData();
+
+        // copy constructor
+        AudioData(const AudioData &data);
+
+        ~AudioData();
+
+        int sampleCount() const;
+
+        unsigned size() const;
+
     };
 
     struct AudioDevice {

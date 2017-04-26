@@ -11,7 +11,7 @@ using namespace std;
 namespace sb {
 
     static bool recordFinished = false;
-    static void onRecordFinish(AudioData* data);
+    static void onRecordFinish();
 
     // Shakebot.h
     int testCountSyllables();
@@ -103,13 +103,6 @@ namespace sb {
 
         cout << "Recording for default time..." << endl;
         int failed = 0;
-//        if (!sb::startRecording(onRecordFinish)) {
-//            cout << "- [failed] could not start recording" << endl;
-//            failed++;
-//            recordFinished = true;
-//        }
-//        while (!recordFinished);
-
         if (!client.init()) {
             cerr << "Could not initialize client" << endl;
             failed++;
@@ -117,30 +110,25 @@ namespace sb {
             cerr << "Could not initialize capture device" << endl;
             failed++;
         } else {
+            client.setCaptureCallback(onRecordFinish);
             AudioDevice *device = client.getCaptureDevice();
             device->params.channelCount = CHANNEL_COUNT_CAPTURE;
             device->params.sampleFormat = SAMPLE_FORMAT;
             device->bufferSize = BUFFER_SIZE_CAPTURE;
             cout << *device << endl;
-//            if (client.isStreamActive()) {
-//                cerr << "Client should not be active yet" << endl;
-//                failed++;
-//            } else if (!client.canRecord()) {
-//                cerr << "Client should be able to record" << endl;
-//                failed++;
-
-            if (!client.record(MAX_SECONDS, onRecordFinish)) {
+            if (!client.record(MAX_SECONDS)) {
                 cerr << "Failed to start recording" << endl;
                 failed++;
             }
         }
+
         while (!recordFinished);
 
         cout << "Done." << endl;
         return failed;
     }
 
-    void onRecordFinish(AudioData *data) {
+    void onRecordFinish() {
         cout << "- Finished recording" << endl;
         if (!client.close()) {
             cerr << "Failed to close stream" << endl;
@@ -156,15 +144,13 @@ namespace sb {
         device->params.sampleFormat = SAMPLE_FORMAT;
         device->bufferSize = BUFFER_SIZE_CAPTURE;
         cout << *device << endl;
-        if (!client.play(*data)) {
+        if (!client.play()) {
             cerr << "Failed to playback" << endl;
             return;
         }
 
-        //playAudio(data);
-        //encodeFlac(*data, "test/test.flac");
         json result;
-        if (speech2text(data, result)) {
+        if (speech2text(client.data(), result)) {
             cout << result.dump(4) << endl;
         }
         recordFinished = true;

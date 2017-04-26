@@ -6,6 +6,32 @@ namespace sb {
 
     static bool initCaptureDevice();
 
+    AudioData::AudioData() {
+    }
+
+    AudioData::AudioData(const AudioData &data) {
+        frameIndex = data.frameIndex;
+        frameCount = data.frameCount;
+        captureChannels = data.captureChannels;
+        recordedSamples = (Sample*) malloc(data.size());
+        memcpy(recordedSamples, data.recordedSamples, data.size());
+    }
+
+    AudioData::~AudioData() {
+        if (recordedSamples != NULL) {
+            free(recordedSamples);
+            recordedSamples = NULL;
+        }
+    }
+
+    int AudioData::sampleCount() const {
+        return frameCount * captureChannels;
+    }
+
+    unsigned AudioData::size() const {
+        return sampleCount() * sizeof(Sample);
+    }
+
     ostream &operator<<(ostream &out, const AudioDevice &device) {
         out << "AudioDevice{";
         out << "index=" << device.params.device << ", ";

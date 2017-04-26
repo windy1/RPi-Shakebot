@@ -3,6 +3,8 @@
 #include <iostream>
 #include "audio/speech.h"
 #include "cmd/Command.h"
+#include "app.h"
+#include "audio/AudioClient.h"
 
 const regex syllableRegex("[aeiouy]+");
 
@@ -77,31 +79,38 @@ namespace sb {
                 pauseClock.restart();
             }
         }
-    }
 
-    bool Shakebot::interpret(const AudioData *data) {
-        json response;
-        if (!speech2text(data, response)) {
-            cerr << "Could not retrieve voice translation" << endl;
-            return false;
-        }
-        cout << response.dump(4) << endl;
-        if (response.empty()) {
-            cerr << "Empty response" << endl;
-            return false;
-        }
+        if (in != NULL) {
+            if (!sb::getAudioClient()->close()) {
+                cerr << "Could not close audio stream" << endl;
+                return;
+            }
 
-        json alternatives = response["results"][0]["alternatives"];
-        cout << alternatives << endl;
-        for (auto alt : alternatives) {
-            cout << alt << endl;
-            cmd_ptr cmd = Command::parse(alt["transcript"]);
-            if (cmd != NULL) {
-                say(cmd->execute());
+            json response;
+            if (!speech2text(in, response)) {
+                cerr << "Could not retrieve voice translation" << endl;
+                return;
+            }
+            cout << response.dump(4) << endl;
+            if (response.empty()) {
+                cerr << "Empty response" << endl;
+                return;
+            }
+
+            json alternatives = response["results"][0]["alternatives"];
+            cout << alternatives << endl;
+            for (auto alt : alternatives) {
+                cout << alt << endl;
+                cmd_ptr cmd = Command::parse(alt["transcript"]);
+                if (cmd != NULL) {
+                    say(cmd->execute());
+                }
             }
         }
+    }
 
-        return true;
+    void Shakebot::interpret(const AudioData *data) {
+        in = data;
     }
 
     int countSyllables(string phrase, unsigned int n) {

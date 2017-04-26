@@ -27,16 +27,13 @@ namespace sb {
         window.setKeyRepeatEnabled(KEY_REPEAT);
     }
 
-    void onRecordFinished(AudioData *data) {
+    void onRecordFinished() {
+        // Note: Called from PA thread
         cout << "onRecordFinished" << endl;
         AudioClient *audio = sb::getAudioClient();
         cout << "Active: " << boolalpha << audio->isStreamActive() << endl;
         cout << "Stopped: " << boolalpha << audio->isStreamStopped() << endl;
-        sb::getBot()->interpret(data);
-        audio->close();
-//        if (!sb::resetAudio()) {
-//            cerr << "Could not re-init audio" << endl;
-//        }
+        sb::getBot()->interpret(audio->data());
     }
 
     void pollInput() {
@@ -50,10 +47,8 @@ namespace sb {
                     //sb::getBot()->say("Hello, world!");
                     //startRecording(onRecordFinished);
                     AudioClient *audio = sb::getAudioClient();
-                    if (audio->isStreamActive()) {
-                        audio->close();
-                    }
-                    audio->record(MAX_SECONDS, onRecordFinished);
+                    audio->setCaptureCallback(onRecordFinished);
+                    audio->record(MAX_SECONDS);
                     break;
                 }
                 default:

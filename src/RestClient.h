@@ -14,10 +14,19 @@ namespace sb {
      * A REST response
      */
     struct RestResponse {
+
         CURLcode    code;
-        char        *data = NULL;
         size_t      size;
-        json        asJson();
+        char        *data = NULL;
+
+        json asJson();
+
+        RestResponse();
+
+        RestResponse(const RestResponse &response);
+
+        ~RestResponse();
+
     };
 
     /**

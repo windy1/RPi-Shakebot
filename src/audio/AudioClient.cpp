@@ -58,7 +58,7 @@ namespace sb {
         in = (const Sample*) inputBuffer;
         sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
 
-        unsigned long framesLeft = (unsigned long) (data->numFrames - data->frameIndex);
+        unsigned long framesLeft = (unsigned long) (data->frameCount - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             // write the rest of the frames
             frames = framesLeft;
@@ -110,7 +110,7 @@ namespace sb {
         // Note: The following has been hardcoded to write 1-channel input
         // (mono) to 2-channel output (stereo).
 
-        unsigned int framesLeft = (unsigned int) (data->numFrames - data->frameIndex);
+        unsigned int framesLeft = (unsigned int) (data->frameCount - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             int i = 0;
             for (i = 0; i < framesLeft; i++) {
@@ -152,13 +152,7 @@ namespace sb {
         // close stream and pass callback recorded data
         cout << "Stream complete." << endl;
         assert(audioData != NULL);
-        AudioData *data = (AudioData*) audioData;
-        data->callback(data);
-        // free sample memory
-        if (data->recordedSamples != NULL) {
-            free(data->recordedSamples);
-            data->recordedSamples = NULL;
-        }
+        ((AudioData* ) audioData)->client->getCaptureCallback()();
     }
 
 
@@ -194,7 +188,6 @@ namespace sb {
         if (isStreamActive()) {
             Pa_AbortStream(stream);
         }
-        resetData();
         Pa_Terminate();
     }
 
@@ -210,7 +203,7 @@ namespace sb {
             return initialized;
         }
 
-        resetData();
+        dat = {};
         captureDevice = {};
         playbackDevice = {};
         stream = NULL;
@@ -237,11 +230,8 @@ namespace sb {
         return init();
     }
 
-    void AudioClient::resetData() {
-        if (data.recordedSamples != NULL) {
-            free(data.recordedSamples);
-            data = {};
-        }
+    const AudioData* AudioClient::data() {
+        return &dat;
     }
 
     bool AudioClient::setCaptureDevice(int index) {
@@ -280,6 +270,14 @@ namespace sb {
         return &captureDevice;
     }
 
+    CaptureCallback AudioClient::getCaptureCallback() const {
+        return captureCallback;
+    }
+
+    void AudioClient::setCaptureCallback(CaptureCallback captureCallback) {
+        this->captureCallback = captureCallback;
+    }
+
     bool AudioClient::isStreamActive() {
         return stream != NULL && Pa_IsStreamActive(stream) == 1;
     }
@@ -289,15 +287,12 @@ namespace sb {
     }
 
     bool AudioClient::close() {
+        // WARNING: DO NOT CALL FROM CALLBACK
         // the RPi doesn't seem to like this for some reason
         PaError err = paNoError;
         if (!isStreamStopped()) {
             cout << "Stopping stream" << endl;
-            try {
-                err = Pa_StopStream(stream);
-            } catch (...) {
-                cerr << "PA threw an exception while stopping stream" << endl;
-            }
+            err = Pa_StopStream(stream);
             cout << "close.Stopped: " << boolalpha << isStreamStopped() << endl;
             if (err != paNoError) {
                 cerr << "Could not stop stream" << endl;
@@ -320,7 +315,7 @@ namespace sb {
             cerr << "Cannot open stream" << endl;
             return false;
         }
-        if (data.recordedSamples != NULL) {
+        if (dat.recordedSamples != NULL) {
             cerr << "Sample data already allocated" << endl;
             return false;
         }
@@ -333,16 +328,29 @@ namespace sb {
         return true;
     }
 
-    bool AudioClient::record(int seconds, RecordCallback callback) {
+    bool AudioClient::record(int seconds) {
         if (!canRecord()) {
             cerr << "Could not start recording" << endl;
             return false;
         }
 
-        PaError     err         = paNoError;
-        int         numFrames   = seconds * captureDevice.sampleRate;
-        int         numSamples  = numFrames * captureDevice.params.channelCount;
-        unsigned    numBytes    = numSamples * sizeof(Sample);
+        PaError err = paNoError;
+        int numFrames = seconds * captureDevice.sampleRate;
+
+        // initialize data buffer
+        dat = {};
+        dat.client = this;
+        dat.frameCount = numFrames;
+        dat.frameIndex = 0;
+        dat.captureChannels = captureDevice.params.channelCount;
+        dat.recordedSamples = (Sample*) malloc(dat.size());
+        if (dat.recordedSamples == NULL) {
+            cerr << "Could not allocate sample data" << endl;
+            return false;
+        }
+        for (int i = 0; i < dat.sampleCount(); i++) {
+            dat.recordedSamples[i] = 0;
+        }
 
         cout << "Starting new recording" << endl;
         cout << "- Max Seconds: " << seconds << endl;
@@ -351,28 +359,13 @@ namespace sb {
         cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
         cout << "- Buffer Size: " << captureDevice.bufferSize << endl;
         cout << "- Max Frames: " << numFrames << endl;
-        cout << "- Max Samples: " << numSamples << endl;
-        cout << "- Max bytes: " << numBytes << endl;
-
-        // initialize data buffer
-        data = {};
-        data.numFrames = numFrames;
-        data.frameIndex = 0;
-        data.recordedSamples = (Sample*) malloc(numBytes);
-        data.callback = callback;
-        if (data.recordedSamples == NULL) {
-            cerr << "Could not allocate sample data" << endl;
-            return false;
-        }
-        for (int i = 0; i < numSamples; i++) {
-            data.recordedSamples[i] = 0;
-        }
+        cout << "- Max Samples: " << dat.sampleCount() << endl;
+        cout << "- Max bytes: " << dat.size() << endl;
 
         // open input stream
-        err = openInputStream(&stream, captureDevice, data);
+        err = openInputStream(&stream, captureDevice, dat);
         if (err != paNoError) {
             paErr(err);
-            free(data.recordedSamples);
             return false;
         }
 
@@ -380,14 +373,16 @@ namespace sb {
         err = Pa_SetStreamFinishedCallback(stream, onStreamFinished);
         if (err != paNoError) {
             paErr(err);
-            return abortRecord(); // free sample data and abort stream
+            Pa_AbortStream(stream);
+            return false;
         }
 
         // start capturing samples (non-blocking)
         err = Pa_StartStream(stream);
         if (err != paNoError) {
             paErr(err);
-            return abortRecord();
+            Pa_AbortStream(stream);
+            return false;
         }
 
         cout << "[recording]" << endl;
@@ -440,7 +435,7 @@ namespace sb {
             cerr << "Cannot open stream" << endl;
             return false;
         }
-        if (data.recordedSamples == NULL) {
+        if (dat.recordedSamples == NULL) {
             cerr << "Sample data is NULL" << endl;
             return false;
         }
@@ -453,22 +448,22 @@ namespace sb {
         return true;
     }
 
-    bool AudioClient::play(AudioData &data) {
+    bool AudioClient::play() {
         if (!canPlay()) {
             cerr << "Could not start playback" << endl;
             return false;
         }
 
-        data.frameIndex = 0;
+        dat.frameIndex = 0;
 
         cout << "Playing back recording" << endl;
-        cout << "- Frames: " << data.numFrames << endl;
+        cout << "- Frames: " << dat.frameCount << endl;
         cout << "- Channels: " << playbackDevice.params.channelCount << endl;
         cout << "- Sample Rate: " << playbackDevice.sampleRate << " Hz" << endl;
         cout << "- Sample Format: " << typeid(Sample).name() << sizeof(Sample) * 8 << endl;
         cout << "- Buffer Size: " << playbackDevice.bufferSize << endl;
 
-        PaError err = openOutputStream(&stream, playbackDevice, data);
+        PaError err = openOutputStream(&stream, playbackDevice, dat);
         if (err != paNoError) {
             paErr(err);
             return false;
@@ -517,12 +512,6 @@ namespace sb {
             return false;
         }
         return true;
-    }
-
-    bool AudioClient::abortRecord() {
-        Pa_AbortStream(stream);
-        free(data.recordedSamples);
-        return false;
     }
 
 }

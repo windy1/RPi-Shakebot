@@ -25,7 +25,7 @@ namespace sb {
 
     bool speech2text(const AudioData *data, json &result) {
         // copy sample data -- TODO: necessary?
-        size_t numSamples = (size_t) (data->numFrames * CHANNEL_COUNT_CAPTURE);
+        size_t numSamples = (size_t) (data->frameCount * CHANNEL_COUNT_CAPTURE);
         size_t numBytes = numSamples * sizeof(Sample);
         char *buffer = (char*) malloc(numBytes);
         if (buffer == NULL) {
@@ -53,7 +53,7 @@ namespace sb {
 
         // perform request
         cout << "Sending new Voice API request" << endl;
-        cout << "- Frames: " << data->numFrames << endl;
+        cout << "- Frames: " << data->frameCount << endl;
         RestResponse *response = client.post(requestBody.dump(), SPEECH_API_URL);
         if (response == NULL) {
             cerr << "Could not perform POST request" << endl;

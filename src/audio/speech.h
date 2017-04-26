@@ -4,6 +4,7 @@
 #include <thread>
 #include <string>
 #include <future>
+#include "audio.h"
 
 using namespace std;
 
