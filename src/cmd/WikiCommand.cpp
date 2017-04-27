@@ -15,7 +15,7 @@ namespace sb {
             cerr << "Could not get Wikipedia results" << endl;
             return "";
         }
-        cout << result << endl;
+        cout << "result = " << result << endl;
         if (result.empty()) {
             return "";
         }
