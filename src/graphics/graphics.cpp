@@ -2,7 +2,6 @@
 #include "../sb.h"
 #include "../Shakebot.h"
 #include "../audio/AudioClient.h"
-#include <unistd.h>
 
 namespace sb {
 
@@ -34,19 +33,19 @@ namespace sb {
 
     void pollInput() {
         sf::Event event;
+        AudioClient *audio = sb::getAudioClient();
         while (window.pollEvent(event)) {
             switch (event.type) {
                 case sf::Event::Closed:
                     window.close();
                     break;
-                case sf::Event::MouseButtonPressed: {
-                    //sb::getBot()->say("Hello, world!");
-                    //startRecording(onRecordFinished);
-                    AudioClient *audio = sb::getAudioClient();
+                case sf::Event::MouseButtonPressed:
                     audio->setCaptureCallback(onRecordFinished);
                     audio->record(MAX_SECONDS);
                     break;
-                }
+                case sf::Event::MouseButtonReleased:
+                    audio->close();
+                    break;
                 default:
                     break;
             }

@@ -36,13 +36,6 @@ namespace sb {
          */
         bool init();
 
-//        /**
-//         * Resets and reinitializes the client and PortAudio.
-//         *
-//         * @return True if successful
-//         */
-//        bool reset();
-
         /**
          * Returns a pointer to the client's captured data.
          *

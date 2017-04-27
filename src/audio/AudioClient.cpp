@@ -216,20 +216,6 @@ namespace sb {
         return initialized;
     }
 
-//    bool AudioClient::reset() {
-//        if (!initialized) {
-//            cerr << "Client not initialized" << endl;
-//            return false;
-//        }
-//        PaError err = Pa_Terminate();
-//        if (err != paNoError) {
-//            cerr << "Could not terminate PA" << endl;
-//            return false;
-//        }
-//        initialized = false;
-//        return init();
-//    }
-
     const AudioData* AudioClient::data() const {
         return &dat;
     }
