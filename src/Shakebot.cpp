@@ -1,6 +1,5 @@
 #include "Shakebot.h"
 #include <regex>
-#include <iostream>
 #include "audio/speech.h"
 #include "cmd/Command.h"
 #include "app.h"

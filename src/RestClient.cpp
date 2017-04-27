@@ -14,6 +14,10 @@ namespace sb {
         }
     }
 
+    CURL* RestClient::getCurl() const {
+        return curl;
+    }
+
     bool RestClient::isVerbose() const {
         return verbose;
     }
@@ -74,6 +78,9 @@ namespace sb {
         assert(curl != NULL);
         assert(!url.empty());
 
+        cout << "[============================================================ cURL ";
+        cout << "============================================================]" << endl;
+
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());   // set request url
         curl_easy_setopt(curl, CURLOPT_POST, post);         // set request method
 
@@ -95,6 +102,9 @@ namespace sb {
             cerr << "Unexpected result content type: " << contentType << endl;
             return NULL;
         }
+
+        cout << "[=====================================================================";
+        cout << "=========================================================]" << endl;
 
         return &response;
     }
@@ -118,6 +128,11 @@ namespace sb {
         if (data != NULL) {
             free(data);
         }
+    }
+
+    ostream& operator<<(ostream &out, const RestResponse &response) {
+        out << response.data << endl;
+        return out;
     }
 
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {

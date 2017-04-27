@@ -36,7 +36,7 @@ namespace sb {
      * @param str phrase to execute
      * @param pr  promise to be completed once the phrase has been executed
      */
-    void pushSpeech(const string str, promise<bool> &pr);
+    void pushSpeech(string str, promise<bool> &pr);
 
 }
 

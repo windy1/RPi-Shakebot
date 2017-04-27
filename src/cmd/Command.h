@@ -17,6 +17,7 @@ namespace sb {
     public:
 
         static const string GREETING;
+        static const string SEARCH;
 
         virtual string getType() const = 0;
 

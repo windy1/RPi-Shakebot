@@ -15,7 +15,7 @@ namespace sb {
     static void speech() {
         // the main method for the speech thread
         running = true;
-        festival_initialize(true, 210000);
+        festival_initialize(true, 840000);
         cout << "- Speech thread initialized" << endl;
         while (running) {
             if (!phraseQueue.empty()) {
@@ -45,7 +45,7 @@ namespace sb {
         th.join();
     }
 
-    void pushSpeech(const string str, promise<bool> &pr) {
+    void pushSpeech(string str, promise<bool> &pr) {
         cout << "- Speech queued: \"" << str << "\"" << endl;
         phraseQueue.push({pr, str});
     }

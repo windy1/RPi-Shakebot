@@ -1,12 +1,8 @@
 #include "speech_api.h"
 #include "base64.h"
 #include "../RestClient.h"
-#include <curl/curl.h>
 
-#define SPEECH_API_URL          "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
-#define HEADER_ACCEPT           "Accept: application/json"
-#define HEADER_CONTENT_TYPE     "Content-Type: application/json"
-#define HEADER_CHARSETS         "charsets: utf-8"
+#define SPEECH_API_URL "https://speech.googleapis.com/v1/speech:recognize?key=AIzaSyCbVXMMo2EhmUPBl3Ikg-T9WgX20dshg4Q"
 
 // Reference: https://curl.haxx.se/libcurl/c/
 
@@ -41,10 +37,10 @@ namespace sb {
 
         // initialize client
         RestClient client;
-        client.addHeader(HEADER_ACCEPT);
-        client.addHeader(HEADER_CONTENT_TYPE);
+        client.addHeader(HEADER_ACCEPT_JSON);
+        client.addHeader(HEADER_CONTENT_TYPE_JSON);
+        client.addHeader(HEADER_CHARSETS_UTF_8);
         client.addHeader("Content-Length: " + to_string(strlen(requestBody.dump().c_str())));
-        client.addHeader(HEADER_CHARSETS);
         if (!client.init()) {
             cerr << "Could not initialize REST client" << endl;
             free(buffer);

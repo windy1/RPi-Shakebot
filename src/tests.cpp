@@ -1,8 +1,8 @@
 #include "tests.h"
 #include "Shakebot.h"
-#include "audio/flac.h"
 #include "audio/speech.h"
 #include "audio/AudioClient.h"
+#include "cmd/wiki_api.h"
 #include <fstream>
 #include <festival/festival.h>
 
@@ -11,6 +11,9 @@ using namespace std;
 namespace sb {
 
     static bool recordFinished = false;
+    static AudioClient client;
+    static const AudioData *in = NULL;
+
     static void onRecordFinish();
 
     // Shakebot.h
@@ -19,13 +22,16 @@ namespace sb {
     int testFestival();
     // record.h
     int testPortAudio();
+    // wiki_api.h
+    int testWikiApi();
 
     int runTests() {
         cout << "Running tests..." << endl;
         int failed = 0;
-        failed += sb::testCountSyllables();
-        failed += sb::testFestival();
-        failed += sb::testPortAudio();
+        //failed += testCountSyllables();
+        failed += testFestival();
+        //failed += testPortAudio();
+        //failed += testWikiApi();
         return failed;
     }
 
@@ -87,17 +93,15 @@ namespace sb {
     int testFestival() {
         cout << "**** testFestival() ****" << endl;
         int failed = 0;
-        festival_initialize(true, 210000);
-        if (!festival_say_text("Hello world")) {
+        festival_initialize(true, 840000);
+        if (!festival_say_text("supercalifragilisticexpialidocious")) {
             failed++;
             cout << "- [failed] could not say text" << endl;
         }
+        festival_tidy_up();
         cout << "Done." << endl;
         return failed;
     }
-
-    AudioClient client;
-    const AudioData *in = NULL;
 
     int testPortAudio() {
         cout << "**** testPortAudio() ****" << endl;
@@ -156,6 +160,25 @@ namespace sb {
         cout << "- Finished recording" << endl;
         in = client.data();
         recordFinished = true;
+    }
+
+    int testWikiApi() {
+        cout << "**** testWikiApi ****" << endl;
+        json result;
+        if (!getWikiInfo("Phish", result)) {
+            cerr << "Could not make wiki request" << endl;
+            return 1;
+        }
+
+        festival_initialize(true, 840000);
+        for (auto &page : result["query"]["pages"]) {
+            cout << page.dump(4) << endl;
+            EST_String str = page["extract"].get<string>().c_str();
+            festival_say_text(str);
+        }
+        festival_tidy_up();
+
+        return 0;
     }
 
 }

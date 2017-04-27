@@ -1,6 +1,10 @@
 #ifndef SHAKESPEARE_CURL_UTILS_H
 #define SHAKESPEARE_CURL_UTILS_H
 
+#define HEADER_ACCEPT_JSON          "Accept: application/json"
+#define HEADER_CONTENT_TYPE_JSON    "Content-Type: application/json"
+#define HEADER_CHARSETS_UTF_8       "charsets: utf-8"
+
 #include <curl/curl.h>
 #include <string>
 #include "json.hpp"
@@ -27,6 +31,8 @@ namespace sb {
 
         ~RestResponse();
 
+        friend ostream& operator<<(ostream &out, const RestResponse &response);
+
     };
 
     /**
@@ -46,6 +52,8 @@ namespace sb {
     public:
 
         ~RestClient();
+
+        CURL* getCurl() const;
 
         /**
          * Returns true if cURL should have verbose logging enabled.

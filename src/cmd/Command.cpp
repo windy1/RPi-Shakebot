@@ -2,17 +2,27 @@
 #include <iostream>
 #include "Command.h"
 #include "GreetingCommand.h"
+#include "SearchCommand.h"
 
 namespace sb {
 
-    const string Command::GREETING = "greeting";
+    const string Command::GREETING  = "greeting";
+    const string Command::SEARCH    = "search";
 
     static vector<string> greetingQualifiers;
     static vector<string> greetingResponses;
 
+    static vector<string> searchQualifiers;
+
     static bool readLines(string fileName, vector<string> &buffer);
 
     cmd_ptr Command::parse(string raw) {
+        for (string qualifier : searchQualifiers) {
+            if (raw.substr(0, qualifier.size()) == qualifier) {
+                string subject = raw.substr(qualifier.size() + 1);
+                return make_shared<SearchCommand>(subject);
+            }
+        }
         for (string qualifier : greetingQualifiers) {
             if (raw.substr(0, qualifier.size()) == qualifier) {
                 // command is a greeting
@@ -31,6 +41,7 @@ namespace sb {
         bool success = true;
         success &= readLines("greetings.txt", greetingResponses);
         success &= readLines("greetings_q.txt", greetingQualifiers);
+        success &= readLines("search_q.txt", searchQualifiers);
         return success;
     }
 
