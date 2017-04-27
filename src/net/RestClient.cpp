@@ -113,7 +113,9 @@ namespace sb {
         assert(data != NULL);
         cout << "debug2.5" << endl;
         cout << data << endl;
-        return json::parse(data);
+        char *cp = (char*) malloc(size);
+        memcpy(cp, data, size);
+        return json::parse(cp);
     }
 
     RestResponse::RestResponse() {
