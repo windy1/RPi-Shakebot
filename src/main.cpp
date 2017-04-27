@@ -138,7 +138,6 @@ namespace sb {
         }
 
         cout << "debug2" << endl;
-        cout << response->data << endl;
 
         result = response->asJson();
 

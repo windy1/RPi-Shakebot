@@ -20,6 +20,7 @@ namespace sb {
             return "";
         }
         json firstPage = *result["query"]["pages"].begin();
+        cout << "first page = " << firstPage << endl;
         string extract = firstPage["extract"];
         cout << "extract = " << extract << endl;
         return extract;
