@@ -111,6 +111,7 @@ namespace sb {
 
     json RestResponse::asJson() {
         assert(data != NULL);
+        cout << "debug2.5" << endl;
         return json::parse(data);
     }
 
