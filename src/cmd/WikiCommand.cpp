@@ -15,10 +15,10 @@ namespace sb {
             cerr << "Could not get Wikipedia results" << endl;
             return "";
         }
+        cout << result << endl;
         if (result.empty()) {
             return "";
         }
-        cout << result << endl;
         return (*result["query"]["pages"].begin())["extract"];
     }
 
