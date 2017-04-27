@@ -129,13 +129,19 @@ namespace sb {
         char url[len];
         sprintf(url, WIKI_API_URL, curl_easy_escape(client.getCurl(), subject.c_str(), (int) subject.size()));
 
+        cout << "debug1" << endl;
+
         RestResponse *response = client.get(url, "application/json; charset=utf-8");
         if (response == NULL) {
             cerr << "Could not perform GET request" << endl;
             return false;
         }
 
+        cout << "debug2" << endl;
+
         result = response->asJson();
+
+        cout << "debug3" << endl;
 
         return true;
     }
