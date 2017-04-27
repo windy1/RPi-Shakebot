@@ -19,7 +19,10 @@ namespace sb {
         if (result.empty()) {
             return "";
         }
-        return (*result["query"]["pages"].begin())["extract"];
+        json firstPage = *result["query"]["pages"].begin();
+        string extract = firstPage["extract"];
+        cout << "extract = " << extract << endl;
+        return extract;
     }
 
 }

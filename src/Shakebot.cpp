@@ -20,6 +20,7 @@ namespace sb {
     }
 
     void Shakebot::say(string phrase) {
+        cout << "Pushing phrase: " << phrase << endl;
         phraseBuffer = phrase;
     }
 
