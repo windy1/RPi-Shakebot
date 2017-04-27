@@ -1,10 +1,7 @@
-#include <iostream>
-#include "app.h"
-#include "tests.h"
-#include "audio/speech.h"
+#include "sb.h"
 #include "Shakebot.h"
-#include "graphics/graphics.h"
 #include "cmd/Command.h"
+#include "net/RestClient.h"
 
 sb::Shakebot    bot;
 sb::AudioClient *audio  = NULL;
@@ -82,6 +79,65 @@ namespace sb {
 
     void setRunning(bool r) {
         running = r;
+    }
+
+    bool speech2text(const AudioData *data, json &result) {
+        SpeechRequest request(data);
+
+        // initialize client
+        RestClient client;
+        client.addHeader(HEADER_ACCEPT_JSON);
+        client.addHeader(HEADER_CONTENT_TYPE_JSON);
+        client.addHeader(HEADER_CHARSETS_UTF_8);
+        client.addHeader("Content-Length: " + to_string(strlen(request.requestBody.dump().c_str())));
+        if (!client.init()) {
+            cerr << "Could not initialize REST client" << endl;
+            return false;
+        }
+
+        // perform request
+        cout << "Sending new Voice API request" << endl;
+        cout << "- Frames: " << data->frameCount << endl;
+        RestResponse *response = client.post(request.requestBody.dump(), SPEECH_API_URL);
+        if (response == NULL) {
+            cerr << "Could not perform POST request" << endl;
+            return false;
+        }
+
+        result = response->asJson();
+
+        return true;
+    }
+
+    bool getWikiInfo(string subject, json &result) {
+        // initialize client
+        RestClient client;
+        client.addHeader(HEADER_ACCEPT_JSON);
+        client.addHeader(HEADER_CONTENT_TYPE_JSON);
+        client.addHeader(HEADER_CHARSETS_UTF_8);
+        client.addHeader(HEADER_API_USER_AGENT);
+        if (!client.init()) {
+            cerr << "Could not initialize REST client" << endl;
+            return false;
+        }
+
+        // perform request
+        cout << "Sending new Wikipedia request" << endl;
+        cout << "- Subject: " << subject << endl;
+
+        size_t len = strlen(WIKI_API_URL);
+        char url[len];
+        sprintf(url, WIKI_API_URL, curl_easy_escape(client.getCurl(), subject.c_str(), (int) subject.size()));
+
+        RestResponse *response = client.get(url, "application/json; charset=utf-8");
+        if (response == NULL) {
+            cerr << "Could not perform GET request" << endl;
+            return false;
+        }
+
+        result = response->asJson();
+
+        return true;
     }
 
 }

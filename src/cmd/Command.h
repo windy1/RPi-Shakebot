@@ -1,11 +1,9 @@
 #ifndef SHAKESPEARE_VOICECOMMAND_H
 #define SHAKESPEARE_VOICECOMMAND_H
 
-#include <string>
+#include "../sb.h"
 #include <vector>
 #include <memory>
-
-using namespace std;
 
 namespace sb {
 
@@ -17,7 +15,7 @@ namespace sb {
     public:
 
         static const string GREETING;
-        static const string SEARCH;
+        static const string WIKI;
 
         virtual string getType() const = 0;
 

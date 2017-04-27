@@ -1,9 +1,8 @@
+#include "sb.h"
 #include "Shakebot.h"
-#include <regex>
-#include "audio/speech.h"
-#include "cmd/Command.h"
-#include "app.h"
 #include "audio/AudioClient.h"
+#include "cmd/Command.h"
+#include <regex>
 
 const regex syllableRegex("[aeiouy]+");
 

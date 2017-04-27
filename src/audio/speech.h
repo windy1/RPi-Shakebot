@@ -1,12 +1,9 @@
 #ifndef SHAKESPEARE_VOICE_H
 #define SHAKESPEARE_VOICE_H
 
-#include <thread>
-#include <string>
-#include <future>
 #include "audio.h"
-
-using namespace std;
+#include <thread>
+#include <future>
 
 namespace sb {
 

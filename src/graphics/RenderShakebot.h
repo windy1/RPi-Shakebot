@@ -1,10 +1,7 @@
 #ifndef SHAKESPEARE_RENDERSHAKESPEARE_H
 #define SHAKESPEARE_RENDERSHAKESPEARE_H
 
-#include <SFML/Graphics.hpp>
-#include <string>
-
-using namespace std;
+#include "graphics.h"
 
 namespace sb {
 

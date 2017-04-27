@@ -1,7 +1,9 @@
 #ifndef SHAKESPEARE_GRAPHICSX_H
 #define SHAKESPEARE_GRAPHICSX_H
 
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics.hpp>
+
+using namespace std;
 
 namespace sb {
 

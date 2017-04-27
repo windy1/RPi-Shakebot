@@ -1,5 +1,3 @@
-#include <vector>
-#include <cstdlib>
 #include "GreetingCommand.h"
 
 namespace sb {

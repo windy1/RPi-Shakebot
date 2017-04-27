@@ -1,14 +1,10 @@
 #ifndef SHAKESPEARE_SHAKEBOT_H
 #define SHAKESPEARE_SHAKEBOT_H
 
-#include <string>
-#include <thread>
-#include <SFML/Graphics.hpp>
-#include <future>
-#include "audio/speech_api.h"
+#include "sb.h"
 #include "graphics/RenderShakebot.h"
-
-using namespace std;
+#include <thread>
+#include <future>
 
 namespace sb {
 

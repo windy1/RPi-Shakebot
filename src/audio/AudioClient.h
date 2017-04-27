@@ -2,13 +2,19 @@
 #define SHAKESPEARE_AUDIORECORDER_H
 
 #include "audio.h"
-#include <portaudio.h>
-
-using namespace std;
+#include "../sb.h"
 
 namespace sb {
 
-    class AudioClient {
+    /**
+     * Function type to receive recorded audio data.
+     */
+    typedef std::function<void()> CaptureCallback;
+
+    /**
+     * A client to handle audio capture and playback.
+     */
+    class AudioClient : public NonAssignable {
 
         AudioData           dat;
         AudioDevice         captureDevice;
@@ -17,7 +23,7 @@ namespace sb {
         PaStream            *stream         = NULL;
         bool                initialized     = false;
 
-        bool canOpen();
+        bool canOpenStream();
 
     public:
 
@@ -30,14 +36,19 @@ namespace sb {
          */
         bool init();
 
-        /**
-         * Resets and reinitializes the client and PortAudio.
-         *
-         * @return True if successful
-         */
-        bool reset();
+//        /**
+//         * Resets and reinitializes the client and PortAudio.
+//         *
+//         * @return True if successful
+//         */
+//        bool reset();
 
-        const AudioData* data();
+        /**
+         * Returns a pointer to the client's captured data.
+         *
+         * @return Pointer to captured data
+         */
+        const AudioData* data() const;
 
         /**
          * Sets the device to use for audio capture. This method will use the
@@ -64,8 +75,20 @@ namespace sb {
          */
         AudioDevice* getCaptureDevice();
 
+        /**
+         * Returns the callback to be called once recording has been completed.
+         *
+         * @return Callback function
+         */
         CaptureCallback getCaptureCallback() const;
 
+        /**
+         * Sets the callback to be called once recording has been completed.
+         * Note: The stream should be altered from the callback function / PA
+         * thread.
+         *
+         * @param captureCallback Callback function
+         */
         void setCaptureCallback(CaptureCallback captureCallback);
 
         /**

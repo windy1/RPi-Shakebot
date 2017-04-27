@@ -1,16 +1,8 @@
 #ifndef SHAKESPEARE_CURL_UTILS_H
 #define SHAKESPEARE_CURL_UTILS_H
 
-#define HEADER_ACCEPT_JSON          "Accept: application/json"
-#define HEADER_CONTENT_TYPE_JSON    "Content-Type: application/json"
-#define HEADER_CHARSETS_UTF_8       "charsets: utf-8"
-
+#include "rest.h"
 #include <curl/curl.h>
-#include <string>
-#include "json.hpp"
-
-using json = nlohmann::json;
-using namespace std;
 
 namespace sb {
 
@@ -23,13 +15,18 @@ namespace sb {
         size_t      size;
         char        *data = NULL;
 
-        json asJson();
-
         RestResponse();
 
         RestResponse(const RestResponse &response);
 
         ~RestResponse();
+
+        /**
+         * Returns the response data as json.
+         *
+         * @return
+         */
+        json asJson();
 
         friend ostream& operator<<(ostream &out, const RestResponse &response);
 
@@ -38,7 +35,7 @@ namespace sb {
     /**
      * A cURL wrapper designed to interface with REST APIs
      */
-    class RestClient {
+    class RestClient : public NonAssignable {
 
         static const string DEFAULT_RESULT_TYPE;
 
@@ -47,6 +44,7 @@ namespace sb {
         bool            verbose         = true;
         RestResponse    response;
 
+        /// performs a new request
         RestResponse* perform(string url, bool post, string resultType = DEFAULT_RESULT_TYPE);
 
     public:

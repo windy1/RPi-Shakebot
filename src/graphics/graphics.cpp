@@ -1,12 +1,8 @@
-#include <SFML/Config.hpp>
-#include <SFML/Window.hpp>
-#include <unistd.h>
 #include "graphics.h"
-#include "../app.h"
+#include "../sb.h"
 #include "../Shakebot.h"
 #include "../audio/AudioClient.h"
-
-using namespace std;
+#include <unistd.h>
 
 namespace sb {
 

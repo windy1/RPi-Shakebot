@@ -1,16 +1,15 @@
-#include "SearchCommand.h"
-#include "wiki_api.h"
+#include "WikiCommand.h"
 
 namespace sb {
 
-    SearchCommand::SearchCommand(string subject) : subject(subject) {
+    WikiCommand::WikiCommand(string subject) : subject(subject) {
     }
 
-    string SearchCommand::getType() const {
-        return SEARCH;
+    string WikiCommand::getType() const {
+        return WIKI;
     }
 
-    string SearchCommand::execute() {
+    string WikiCommand::execute() {
         json result;
         if (!getWikiInfo(subject, result)) {
             cerr << "Could not get Wikipedia results" << endl;

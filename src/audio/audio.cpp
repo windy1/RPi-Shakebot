@@ -57,18 +57,18 @@ namespace sb {
         return &audio;
     }
 
-    bool resetAudio() {
-        cout << "Re-Initializing audio..." << endl;
-        if (!audio.reset()) {
-            cerr << "Could not reset client" << endl;
-            return false;
-        }
-        if (!initCaptureDevice()) {
-            cerr << "Could not re-initialize capture device" << endl;
-            return false;
-        }
-        return true;
-    }
+//    bool resetAudio() {
+//        cout << "Re-Initializing audio..." << endl;
+//        if (!audio.reset()) {
+//            cerr << "Could not reset client" << endl;
+//            return false;
+//        }
+//        if (!initCaptureDevice()) {
+//            cerr << "Could not re-initialize capture device" << endl;
+//            return false;
+//        }
+//        return true;
+//    }
 
     bool initCaptureDevice() {
         if (!audio.setCaptureDevice(DEVICE_INDEX)) {

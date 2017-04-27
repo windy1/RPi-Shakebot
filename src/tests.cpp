@@ -1,12 +1,9 @@
-#include "tests.h"
+#include "sb.h"
 #include "Shakebot.h"
-#include "audio/speech.h"
 #include "audio/AudioClient.h"
-#include "cmd/wiki_api.h"
+#include "net/RestClient.h"
 #include <fstream>
 #include <festival/festival.h>
-
-using namespace std;
 
 namespace sb {
 
@@ -22,16 +19,13 @@ namespace sb {
     int testFestival();
     // record.h
     int testPortAudio();
-    // wiki_api.h
-    int testWikiApi();
 
     int runTests() {
         cout << "Running tests..." << endl;
         int failed = 0;
-        //failed += testCountSyllables();
+        failed += testCountSyllables();
         failed += testFestival();
-        //failed += testPortAudio();
-        //failed += testWikiApi();
+        failed += testPortAudio();
         return failed;
     }
 

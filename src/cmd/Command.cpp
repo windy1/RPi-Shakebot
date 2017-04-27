@@ -1,26 +1,25 @@
-#include <fstream>
-#include <iostream>
 #include "Command.h"
 #include "GreetingCommand.h"
-#include "SearchCommand.h"
+#include "WikiCommand.h"
+#include <fstream>
 
 namespace sb {
 
     const string Command::GREETING  = "greeting";
-    const string Command::SEARCH    = "search";
+    const string Command::WIKI      = "wiki";
 
     static vector<string> greetingQualifiers;
     static vector<string> greetingResponses;
 
-    static vector<string> searchQualifiers;
+    static vector<string> wikiQualifiers;
 
     static bool readLines(string fileName, vector<string> &buffer);
 
     cmd_ptr Command::parse(string raw) {
-        for (string qualifier : searchQualifiers) {
+        for (string qualifier : wikiQualifiers) {
             if (raw.substr(0, qualifier.size()) == qualifier) {
                 string subject = raw.substr(qualifier.size() + 1);
-                return make_shared<SearchCommand>(subject);
+                return make_shared<WikiCommand>(subject);
             }
         }
         for (string qualifier : greetingQualifiers) {
@@ -41,7 +40,7 @@ namespace sb {
         bool success = true;
         success &= readLines("greetings.txt", greetingResponses);
         success &= readLines("greetings_q.txt", greetingQualifiers);
-        success &= readLines("search_q.txt", searchQualifiers);
+        success &= readLines("wiki_q.txt", wikiQualifiers);
         return success;
     }
 

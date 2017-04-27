@@ -5,13 +5,13 @@
 
 namespace sb {
 
-    class SearchCommand : public Command {
+    class WikiCommand : public Command {
 
         string subject;
 
     public:
 
-        SearchCommand(string subject);
+        WikiCommand(string subject);
 
         virtual string getType() const override;
 

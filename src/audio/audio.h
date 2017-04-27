@@ -1,10 +1,12 @@
 #ifndef SHAKESPEARE_AUDIO_H_H
 #define SHAKESPEARE_AUDIO_H_H
 
-#include <cstdint>
 #include <portaudio.h>
-#include <iostream>
+#include <festival/festival.h>
+#include <cstdint>
 #include <functional>
+#include <iostream>
+#include <string>
 
 #define MAX_SECONDS             5           // seconds to record
 #define CHANNEL_COUNT_CAPTURE   1           // hw limited to mono
@@ -26,15 +28,10 @@ using namespace std;
 
 namespace sb {
 
+    /// Sample data type
     typedef int16_t Sample;
 
-    struct AudioData;
     class AudioClient;
-
-    /**
-     * Function type to receive recorded audio data.
-     */
-    typedef std::function<void()> CaptureCallback;
 
     /**
      * Raw PCM audio data. Each sample recorded represents an amplitude of the
@@ -42,38 +39,55 @@ namespace sb {
      */
     struct AudioData {
 
-        int frameIndex;                     // incremented iterating sample data
-        int frameCount;                     // the total amount of frames in the recording
-        int captureChannels;                // the amount of channels the data was sampled with
-        Sample *recordedSamples = NULL;     // block of memory containing samples
-        AudioClient *client     = NULL;     // reference to client
+        int         frameIndex;                     /// incremented iterating sample data
+        int         frameCount;                     /// the total amount of frames in the recording
+        int         captureChannels;                /// the amount of channels the data was sampled with
+        Sample      *recordedSamples    = NULL;     /// block of memory containing samples
+        AudioClient *client             = NULL;     /// reference to client
 
         AudioData();
 
-        // copy constructor
         AudioData(const AudioData &data);
 
         ~AudioData();
 
+        /**
+         * Returns the total amount of samples allocated for this data.
+         *
+         * @return Total samples
+         */
         int sampleCount() const;
 
+        /**
+         * Returns the total amount of bytes allocated to this data.
+         *
+         * @return Bytes allocated for data
+         */
         unsigned size() const;
 
     };
 
+    /**
+     * An audio input or output device.
+     */
     struct AudioDevice {
 
-        PaStreamParameters params;
-        unsigned long bufferSize = 0;
-        int sampleRate = SAMPLE_RATE;
+        PaStreamParameters  params;
+        unsigned long       bufferSize = 0;
+        int                 sampleRate = SAMPLE_RATE;
 
         friend ostream &operator<<(ostream &out, const AudioDevice &device);
 
     };
 
+    /**
+     * Initializes a new audio client for the application.
+     *
+     * @return Pointer to new audio client
+     */
     AudioClient* initAudio();
 
-    bool resetAudio();
+    //bool resetAudio();
 
 }
 
