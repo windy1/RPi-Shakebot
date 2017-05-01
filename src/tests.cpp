@@ -135,7 +135,7 @@ namespace sb {
         AudioDevice *device = client.getPlaybackDevice();
         device->params.channelCount = CHANNEL_COUNT_PLAYBACK;
         device->params.sampleFormat = SAMPLE_FORMAT;
-        device->bufferSize = BUFFER_SIZE_CAPTURE;
+        device->bufferSize = BUFFER_SIZE_PLAYBACK;
         cout << *device << endl;
         if (!client.play()) {
             cerr << "Failed to playback" << endl;

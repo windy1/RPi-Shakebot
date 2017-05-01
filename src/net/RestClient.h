@@ -11,9 +11,9 @@ namespace sb {
      */
     struct RestResponse {
 
-        CURLcode    code;
-        size_t      size;
-        char        *data = NULL;
+        CURLcode    code;           /// the response code returned by the server
+        size_t      size;           /// the size of the server's response
+        char        *data = NULL;   /// raw response data
 
         RestResponse();
 
@@ -39,10 +39,10 @@ namespace sb {
 
         static const string DEFAULT_RESULT_TYPE;
 
-        CURL            *curl           = NULL;
-        curl_slist      *requestHeaders = NULL;
-        bool            verbose         = true;
-        RestResponse    response;
+        CURL            *curl           = NULL; /// the underlying CURL object
+        curl_slist      *requestHeaders = NULL; /// HTTP request headers to send
+        bool            verbose         = true; /// CURL logging parameter
+        RestResponse    response;               /// object to read response into
 
         /// performs a new request
         RestResponse* perform(string url, bool post, string resultType = DEFAULT_RESULT_TYPE);
@@ -51,6 +51,11 @@ namespace sb {
 
         ~RestClient();
 
+        /**
+         * Returns the underlying CURL object.
+         *
+         * @return Underlying curl object
+         */
         CURL* getCurl() const;
 
         /**

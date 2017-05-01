@@ -1,11 +1,13 @@
 #include "sb.h"
 #include "Shakebot.h"
-#include "cmd/Command.h"
 #include "net/RestClient.h"
+#include "cmd/Command.h"
 
-sb::Shakebot    bot;
-sb::AudioClient *audio  = NULL;
-bool            running = true;
+static sb::Shakebot    bot;
+static sb::AudioClient *audio  = NULL;
+static bool            running = true;
+
+static int startWikiMode();
 
 int main(int argc, char *argv[]) {
     srand((unsigned) time(NULL));
@@ -25,6 +27,8 @@ int main(int argc, char *argv[]) {
         } else if (args[i] == "--move") {
             offset = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
             cout << "offset=(" << offset.x << "," << offset.y << ")" << endl;
+        } else if (args[i] == "--wiki") {
+            return startWikiMode();
         }
     }
 
@@ -60,6 +64,23 @@ int main(int argc, char *argv[]) {
     sb::stopSpeech();
     cout << "Goodbye." << endl;
 
+    return 0;
+}
+
+int startWikiMode() {
+    string query;
+    while (running) {
+        cout << "Enter a Wikipedia Page" << endl;
+        cout << ">> ";
+        getline(cin, query);
+        cout << "Looking for " << query << endl;
+        json result;
+        if (!sb::getWikiInfo(query, result)) {
+            cerr << "Could not get results" << endl;
+        } else {
+            cout << result.dump(4) << endl;
+        }
+    }
     return 0;
 }
 

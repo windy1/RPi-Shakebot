@@ -16,13 +16,14 @@ namespace sb {
      */
     class AudioClient : public NonAssignable {
 
-        AudioData           dat;
-        AudioDevice         captureDevice;
-        CaptureCallback     captureCallback;
-        AudioDevice         playbackDevice;
-        PaStream            *stream         = NULL;
-        bool                initialized     = false;
+        AudioData           dat;                        /// where the samples will be recorded to
+        AudioDevice         captureDevice;              /// the device to capture samples
+        CaptureCallback     captureCallback;            /// callback to call once recording is complete
+        AudioDevice         playbackDevice;             /// the device to playback audio data to
+        PaStream            *stream         = NULL;     /// the audio input/output stream
+        bool                initialized     = false;    /// initialized state
 
+        /// returns true if a new input or output audio stream can be opened
         bool canOpenStream();
 
     public:

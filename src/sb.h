@@ -54,8 +54,18 @@ namespace sb {
      */
     bool speech2text(const AudioData *data, json &result);
 
+    /**
+     * Returns an extract from Wikipedia about the specified subject.
+     *
+     * @param subject Subject to lookup
+     * @param result Wikipedia results
+     * @return True if successful
+     */
     bool getWikiInfo(string subject, json &result);
 
+    /**
+     * A utility class for non-assignable types. (i.e. RestClient, AudioClient)
+     */
     class NonAssignable {
         NonAssignable(const NonAssignable&) = delete;
         NonAssignable operator=(const NonAssignable&) = delete;

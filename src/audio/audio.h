@@ -8,20 +8,20 @@
 #include <iostream>
 #include <string>
 
-#define MAX_SECONDS             5           // seconds to record
-#define CHANNEL_COUNT_CAPTURE   1           // hw limited to mono
-#define CHANNEL_COUNT_PLAYBACK  2           // playback must be stereo
-#define SAMPLE_RATE             48000       // optimal is 16000, limited by hw
-#define BUFFER_SIZE_CAPTURE     24000       // frames to capture each cycle
-#define BUFFER_SIZE_PLAYBACK    16384       // frames to playback each cycle
-#define SAMPLE_SILENCE          0           // silence sample value
-#define SAMPLE_FORMAT           paInt16     // hw requires 16-bit samples
-#define ENCODING                "LINEAR16"  // the encoding id for voice api
-#define LANGUAGE_CODE           "en-US"     // language being recorded
-#ifdef __APPLE__                            //
-#define DEVICE_INDEX            -1          // use default device
-#else                                       //
-#define DEVICE_INDEX             2          // hardcoded for RPi
+#define MAX_SECONDS             5           /// seconds to record
+#define CHANNEL_COUNT_CAPTURE   1           /// hw limited to mono
+#define CHANNEL_COUNT_PLAYBACK  2           /// playback must be stereo
+#define SAMPLE_RATE             48000       /// optimal is 16000, limited by hw
+#define BUFFER_SIZE_CAPTURE     24000       /// frames to capture each cycle
+#define BUFFER_SIZE_PLAYBACK    16384       /// frames to playback each cycle
+#define SAMPLE_SILENCE          0           /// silence sample value
+#define SAMPLE_FORMAT           paInt16     /// hw requires 16-bit samples
+#define ENCODING                "LINEAR16"  /// the encoding id for voice api
+#define LANGUAGE_CODE           "en-US"     /// language being recorded
+#ifdef __APPLE__                            ///
+#define DEVICE_INDEX            -1          /// macOS -> use default device
+#else                                       ///
+#define DEVICE_INDEX             2          /// RPi -> use hardcoded device
 #endif
 
 using namespace std;
@@ -72,9 +72,9 @@ namespace sb {
      */
     struct AudioDevice {
 
-        PaStreamParameters  params;
-        unsigned long       bufferSize = 0;
-        int                 sampleRate = SAMPLE_RATE;
+        PaStreamParameters  params;                     /// PA parameters
+        unsigned long       bufferSize = 0;             /// amount of samples to process per period
+        int                 sampleRate = SAMPLE_RATE;   /// sample rates in Hz
 
         friend ostream &operator<<(ostream &out, const AudioDevice &device);
 
@@ -86,8 +86,6 @@ namespace sb {
      * @return Pointer to new audio client
      */
     AudioClient* initAudio();
-
-    //bool resetAudio();
 
 }
 

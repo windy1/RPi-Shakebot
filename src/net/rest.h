@@ -12,8 +12,8 @@
 
 namespace sb {
 
-    // A template for speech requests
-    static const json SPEECH_REQUEST_BODY = {
+    /// A template for speech requests
+    const json SPEECH_REQUEST_BODY = {
         {"config", {
             {"encoding", ENCODING},
             {"sampleRateHertz", SAMPLE_RATE},
@@ -24,14 +24,14 @@ namespace sb {
         }}
     };
 
-    static const char *WIKI_API_URL =
-            "https://en.wikipedia.org/w/api.php?"   // main url
-            "format=json"                           // output type
-            "&action=query"                         // api action
-            "&prop=extracts"                        // only give plaintext
-            "&exintro="                             // give only intro
-            "&explaintext="                         //
-            "&titles=%s";                           // title
+    const char *WIKI_API_URL =
+        "https://en.wikipedia.org/w/api.php?"   /// main url
+        "format=json"                           /// output type
+        "&action=query"                         /// api action
+        "&prop=extracts"                        /// only give plaintext
+        "&exintro="                             /// give only intro
+        "&explaintext="                         ///
+        "&titles=%s";                           /// title
 
     /**
      * A request to the Speech API
