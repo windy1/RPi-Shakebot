@@ -26,9 +26,7 @@ namespace sb {
                 continue;
             }
             debug = false;
-            cout << "unlocked" << endl;
             bool empty = phraseQueue.empty();
-            cout << "empty " << empty << endl;
             if (!empty) {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
