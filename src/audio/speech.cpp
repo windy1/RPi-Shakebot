@@ -10,6 +10,7 @@ namespace sb {
     static queue<Phrase> phraseQueue;
 
     bool lock = true;
+    bool debug = false;
 
     static void speech() {
         // the main method for the speech thread
@@ -18,6 +19,10 @@ namespace sb {
         festival_say_text("testing 1 2 3");
         cout << "- Speech thread initialized" << endl;
         while (running) {
+            if (debug) {
+                cout << "lock = " << lock << endl;
+                cout << "empty = " << phraseQueue.empty() << endl;
+            }
             if (lock) {
                 continue;
             }
@@ -54,6 +59,7 @@ namespace sb {
 
     void pushSpeech(string str, promise<bool> &pr) {
         cout << "- Speech queued: \"" << str << "\"" << endl;
+        debug = true;
         lock = true;
         phraseQueue.push({pr, str});
         lock = false;
