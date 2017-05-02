@@ -11,7 +11,7 @@ namespace sb {
 
     public:
 
-        static const int MAX_RESULT_SIZE = 1000;
+        static const int MAX_RESULT_SIZE = 200;
 
         WikiCommand(string subject);
 
