@@ -16,19 +16,19 @@ namespace sb {
         // the main method for the speech thread
         running = true;
         festival_initialize(true, FESTIVAL_HEAP_SIZE);
-        festival_say_text("testing 1 2 3");
         cout << "- Speech thread initialized" << endl;
         while (running) {
             if (debug) {
-                cout << "lock = " << lock << endl;
-                cout << "empty = " << phraseQueue.empty() << endl;
+                cout << "lock " << lock << endl;
+                cout << "empty " << phraseQueue.empty() << endl;
             }
             if (lock) {
                 continue;
             }
+            debug = false;
             cout << "unlocked" << endl;
             bool empty = phraseQueue.empty();
-            cout << "empty = " << empty << endl;
+            cout << "empty " << empty << endl;
             if (!empty) {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
