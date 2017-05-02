@@ -99,7 +99,10 @@ namespace sb {
                 cout << alt << endl;
                 cmd_ptr cmd = Command::parse(alt["transcript"]);
                 if (cmd != NULL) {
-                    say(cmd->execute());
+                    string result = cmd->execute();
+                    if (!result.empty()) {
+                        say(result);
+                    }
                 }
             }
 

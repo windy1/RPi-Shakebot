@@ -111,6 +111,9 @@ namespace sb {
 
     json RestResponse::asJson() {
         assert(data != NULL);
+        if (empty()) {
+            return json();
+        }
         return json::parse(data);
     }
 
@@ -128,6 +131,10 @@ namespace sb {
         if (data != NULL) {
             free(data);
         }
+    }
+
+    bool RestResponse::empty() {
+        return size == 0;
     }
 
     ostream& operator<<(ostream &out, const RestResponse &response) {

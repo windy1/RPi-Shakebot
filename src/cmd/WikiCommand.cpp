@@ -15,10 +15,17 @@ namespace sb {
             cerr << "Could not get Wikipedia results" << endl;
             return "";
         }
-        if (result.empty()) {
+        if (result.empty() || result.find("query") == result.end()) {
             return "";
         }
-        json firstPage = *result["query"]["pages"].begin();
+        json query = result["query"];
+        if (query.find("pages") == query.end()) {
+            return "";
+        }
+        json firstPage = *query["pages"].begin();
+        if (firstPage.find("extract") == firstPage.end()) {
+            return "";
+        }
         string extract = firstPage["extract"];
         if (extract.size() > MAX_RESULT_SIZE) {
             extract = extract.substr(0, MAX_RESULT_SIZE);

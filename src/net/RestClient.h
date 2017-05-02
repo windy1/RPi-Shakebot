@@ -12,7 +12,7 @@ namespace sb {
     struct RestResponse {
 
         CURLcode    code;           /// the response code returned by the server
-        size_t      size;           /// the size of the server's response
+        size_t      size  = 0;      /// the size of the server's response
         char        *data = NULL;   /// raw response data
 
         RestResponse();
@@ -22,9 +22,16 @@ namespace sb {
         ~RestResponse();
 
         /**
+         * Returns true if has no response.
+         *
+         * @return True if no response
+         */
+        bool empty();
+
+        /**
          * Returns the response data as json.
          *
-         * @return
+         * @return data as json
          */
         json asJson();
 
