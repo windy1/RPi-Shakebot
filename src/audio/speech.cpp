@@ -15,7 +15,11 @@ namespace sb {
         festival_initialize(true, FESTIVAL_HEAP_SIZE);
         festival_say_text("testing 1 2 3");
         cout << "- Speech thread initialized" << endl;
+        int i = 0;
         while (running) {
+            if (i++ % 1000) {
+                cout << "pempty = " << phraseQueue.empty() << endl;
+            }
             if (!phraseQueue.empty()) {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
