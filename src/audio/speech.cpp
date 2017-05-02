@@ -17,10 +17,8 @@ namespace sb {
         cout << "- Speech thread initialized" << endl;
         int i = 0;
         while (running) {
-            if (i++ % 1000) {
-                cout << "pempty = " << phraseQueue.empty() << endl;
-            }
-            if (!phraseQueue.empty()) {
+            bool empty = phraseQueue.empty();
+            if (!empty) {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
                 phraseQueue.pop();
