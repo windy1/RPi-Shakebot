@@ -113,7 +113,7 @@ namespace sb {
         assert(data != NULL);
         cout << "debug2.5" << endl;
         cout << data << endl;
-        return json::parse(data);
+        return json::parse(string(data));
     }
 
     RestResponse::RestResponse() {
