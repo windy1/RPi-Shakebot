@@ -20,6 +20,7 @@ namespace sb {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
                 phraseQueue.pop();
+                cout << "- Saying: " << phrase.str << endl;
                 bool success = true;
                 if (!festival_say_text(phrase.str.data())) {
                     cerr << "Error: Could not say text" << endl;
