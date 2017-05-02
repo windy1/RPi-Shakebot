@@ -21,7 +21,9 @@ namespace sb {
             if (lock) {
                 continue;
             }
-            if (!phraseQueue.empty()) {
+            bool empty = phraseQueue.empty();
+            cout << "empty = " << empty << endl;
+            if (!empty) {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
                 phraseQueue.pop();
