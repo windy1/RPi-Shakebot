@@ -1,8 +1,6 @@
 #include "speech.h"
 #include <queue>
 
-#define HEAP_SIZE 840000
-
 // Reference: http://www.cstr.ed.ac.uk/projects/festival/manual/festival_28.html#SEC132
 
 namespace sb {
@@ -14,7 +12,7 @@ namespace sb {
     static void speech() {
         // the main method for the speech thread
         running = true;
-        festival_initialize(true, HEAP_SIZE);
+        festival_initialize(true, FESTIVAL_HEAP_SIZE);
         cout << "- Speech thread initialized" << endl;
         while (running) {
             if (!phraseQueue.empty()) {

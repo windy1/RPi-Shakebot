@@ -11,6 +11,8 @@ namespace sb {
 
     public:
 
+        static const int MAX_RESULT_SIZE = 1000;
+
         WikiCommand(string subject);
 
         virtual string getType() const override;

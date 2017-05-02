@@ -15,14 +15,18 @@ namespace sb {
             cerr << "Could not get Wikipedia results" << endl;
             return "";
         }
-        cout << "result = " << result << endl;
         if (result.empty()) {
             return "";
         }
         json firstPage = *result["query"]["pages"].begin();
-        cout << "first page = " << firstPage << endl;
         string extract = firstPage["extract"];
-        cout << "extract = " << extract << endl;
+        if (extract.size() > MAX_RESULT_SIZE) {
+            extract = extract.substr(0, MAX_RESULT_SIZE);
+            size_t lastStop = extract.find_last_of('.');
+            if (lastStop != string::npos) {
+                extract = extract.substr(0, lastStop);
+            }
+        }
         return extract;
     }
 
