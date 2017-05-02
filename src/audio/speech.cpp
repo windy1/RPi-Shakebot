@@ -21,6 +21,7 @@ namespace sb {
             if (lock) {
                 continue;
             }
+            cout << "unlocked" << endl;
             bool empty = phraseQueue.empty();
             cout << "empty = " << empty << endl;
             if (!empty) {
