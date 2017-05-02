@@ -16,7 +16,6 @@ namespace sb {
         festival_say_text("testing 1 2 3");
         cout << "- Speech thread initialized" << endl;
         while (running) {
-            cout << "speech thread running" << endl;
             if (!phraseQueue.empty()) {
                 // take next phrase and play it
                 Phrase phrase = phraseQueue.front();
@@ -48,6 +47,7 @@ namespace sb {
     void pushSpeech(string str, promise<bool> &pr) {
         cout << "- Speech queued: \"" << str << "\"" << endl;
         phraseQueue.push({pr, str});
+        cout << "empty = " << phraseQueue.empty() << endl;
     }
 
 }
