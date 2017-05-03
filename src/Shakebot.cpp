@@ -1,6 +1,23 @@
+/*
+ * RPi-Shakebot
+ * ============
+ * A voice recognition bot built for Prof. James Eddy's Computer Organization
+ * (CS 121) class on the Raspberry Pi 3 Model B.
+ *
+ * References
+ * ~~~~~~~~~~
+ * [Festival]           : http://www.cstr.ed.ac.uk/projects/festival/manual/festival_28.html#SEC132
+ * [PortAudio]          : http://www.portaudio.com/
+ * [SFML]               : https://www.sfml-dev.org/
+ * [libcurl]            : https://curl.haxx.se/libcurl/c/
+ * [json]               : https://github.com/nlohmann/json
+ * [Google Speech API]  : https://cloud.google.com/speech/docs/
+ * [MediaWiki API]      : https://www.mediawiki.org/wiki/API:Main_page
+ *
+ * Copyright (C) Walker Crouse 2017 <wcrouse@uvm.edu>
+ */
 #include "sb.h"
 #include "Shakebot.h"
-#include "audio/AudioClient.h"
 #include "cmd/Command.h"
 #include <regex>
 
@@ -8,7 +25,7 @@ const regex syllableRegex("[aeiouy]+");
 
 namespace sb {
 
-    Shakebot::Shakebot() : render(RenderShakebot(this, "images/shakespeare.jpg", sf::IntRect(166, 243, 54, 65))) {
+    Shakebot::Shakebot() : render(RenderShakebot(this, "images/shakespeare.jpg", IntRect(166, 243, 54, 65))) {
     }
 
     bool Shakebot::isMouthOpened() {
@@ -48,7 +65,7 @@ namespace sb {
                     }
                 }
                 // take next word from buffer
-                unsigned long wordBreak = phraseBuffer.find(" ");
+                size_t wordBreak = phraseBuffer.find(" ");
                 if (wordBreak != string::npos) {
                     currentWord = phraseBuffer.substr(0, wordBreak);
                     phraseBuffer = phraseBuffer.substr(wordBreak + 1);

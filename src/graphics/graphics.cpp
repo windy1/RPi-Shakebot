@@ -1,3 +1,21 @@
+/*
+ * RPi-Shakebot
+ * ============
+ * A voice recognition bot built for Prof. James Eddy's Computer Organization
+ * (CS 121) class on the Raspberry Pi 3 Model B.
+ *
+ * References
+ * ~~~~~~~~~~
+ * [Festival]           : http://www.cstr.ed.ac.uk/projects/festival/manual/festival_28.html#SEC132
+ * [PortAudio]          : http://www.portaudio.com/
+ * [SFML]               : https://www.sfml-dev.org/
+ * [libcurl]            : https://curl.haxx.se/libcurl/c/
+ * [json]               : https://github.com/nlohmann/json
+ * [Google Speech API]  : https://cloud.google.com/speech/docs/
+ * [MediaWiki API]      : https://www.mediawiki.org/wiki/API:Main_page
+ *
+ * Copyright (C) Walker Crouse 2017 <wcrouse@uvm.edu>
+ */
 #include "graphics.h"
 #include "../sb.h"
 #include "../Shakebot.h"
@@ -5,17 +23,17 @@
 
 namespace sb {
 
-    static const sf::VideoMode  DEFAULT_VIDEO_MODE  (440 * 2, 564 * 2);
-    static const string         WINDOW_TITLE        = "Shakebot 1.0";
-    static const bool           MOUSE_VISIBLE       = false;
-    static const bool           KEY_REPEAT          = false;
+    static const VideoMode  DEFAULT_VIDEO_MODE      (440 * 2, 564 * 2);
+    static const string     WINDOW_TITLE        =   "Shakebot 1.0";
+    static const bool       MOUSE_VISIBLE       =   false;
+    static const bool       KEY_REPEAT          =   false;
 
-    static sf::VideoMode    videoMode   = DEFAULT_VIDEO_MODE;
-    static bool             fullScreen  = false;
-    static sf::RenderWindow window;
+    static VideoMode    videoMode  = DEFAULT_VIDEO_MODE;
+    static bool         fullScreen = false;
+    static RenderWindow window;
 
     void initWindow() {
-        sf::Uint32 style = fullScreen ? sf::Style::Fullscreen : sf::Style::Default;
+        Uint32 style = fullScreen ? Style::Fullscreen : Style::Default;
         cout << "- Creating window" << endl;
         window.create(videoMode, WINDOW_TITLE, style);
         window.setMouseCursorVisible(MOUSE_VISIBLE);
@@ -24,26 +42,23 @@ namespace sb {
 
     void onRecordFinished() {
         // Note: Called from PA thread
-        cout << "onRecordFinished" << endl;
-        AudioClient *audio = sb::getAudioClient();
-        cout << "Active: " << boolalpha << audio->isStreamActive() << endl;
-        cout << "Stopped: " << boolalpha << audio->isStreamStopped() << endl;
-        sb::getBot()->interpret(audio->data());
+        cout << "Recording Complete." << endl;
+        getBot()->interpret(getAudioClient()->data());
     }
 
     void pollInput() {
-        sf::Event event;
-        AudioClient *audio = sb::getAudioClient();
+        Event event;
+        AudioClient *audio = getAudioClient();
         while (window.pollEvent(event)) {
             switch (event.type) {
-                case sf::Event::Closed:
+                case Event::Closed:
                     window.close();
                     break;
-                case sf::Event::MouseButtonPressed:
+                case Event::MouseButtonPressed:
                     audio->setCaptureCallback(onRecordFinished);
                     audio->record(MAX_SECONDS);
                     break;
-                case sf::Event::MouseButtonReleased:
+                case Event::MouseButtonReleased:
                     audio->close();
                     break;
                 default:
@@ -57,14 +72,14 @@ namespace sb {
         setRunning(window.isOpen());
     }
 
-    sf::RenderWindow* getWindow() {
+    RenderWindow* getWindow() {
         return &window;
     }
 
     void setFullScreen(bool fs) {
         fullScreen = fs;
         if (fullScreen) {
-            videoMode = sf::VideoMode::getFullscreenModes()[0];
+            videoMode = VideoMode::getFullscreenModes()[0];
         } else {
             videoMode = DEFAULT_VIDEO_MODE;
         }

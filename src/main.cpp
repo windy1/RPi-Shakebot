@@ -1,31 +1,52 @@
+/*
+ * RPi-Shakebot
+ * ============
+ * A voice recognition bot built for Prof. James Eddy's Computer Organization
+ * (CS 121) class on the Raspberry Pi 3 Model B.
+ *
+ * References
+ * ~~~~~~~~~~
+ * [Festival]           : http://www.cstr.ed.ac.uk/projects/festival/manual/festival_28.html#SEC132
+ * [PortAudio]          : http://www.portaudio.com/
+ * [SFML]               : https://www.sfml-dev.org/
+ * [libcurl]            : https://curl.haxx.se/libcurl/c/
+ * [json]               : https://github.com/nlohmann/json
+ * [Google Speech API]  : https://cloud.google.com/speech/docs/
+ * [MediaWiki API]      : https://www.mediawiki.org/wiki/API:Main_page
+ *
+ * Copyright (C) Walker Crouse 2017 <wcrouse@uvm.edu>
+ */
 #include "sb.h"
 #include "Shakebot.h"
 #include "net/RestClient.h"
 #include "cmd/Command.h"
 
-static sb::Shakebot    bot;
-static sb::AudioClient *audio  = NULL;
-static bool            running = true;
+using namespace sb;
+
+static Shakebot     bot;
+static AudioClient  *audio  = NULL;
+static bool         running = true;
 
 static int startWikiMode();
 
 int main(int argc, char *argv[]) {
     srand((unsigned) time(NULL));
+
     // parse arguments
     vector<string> args(argv, argv + argc);
-    sf::Vector2f scale(1, 1);
-    sf::Vector2f offset(0, 0);
+    Vector2f scale(1, 1);
+    Vector2f offset(0, 0);
     for (int i = 0; i < args.size(); i++) {
         if (args[i] == "--test") {
-            return sb::runTests();
+            return runTests();
         } else if (args[i] == "--fullscreen") {
-            sb::setFullScreen(true);
+            setFullScreen(true);
             cout << "fullscreen=true" << endl;
         } else if (args[i] == "--scale") {
-            scale = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
+            scale = Vector2f(stof(args[i + 1]), stof(args[i + 2]));
             cout << "scale=(" << scale.x << "," << scale.y << ")" << endl;
         } else if (args[i] == "--move") {
-            offset = sf::Vector2f(stof(args[i + 1]), stof(args[i + 2]));
+            offset = Vector2f(stof(args[i + 1]), stof(args[i + 2]));
             cout << "offset=(" << offset.x << "," << offset.y << ")" << endl;
         } else if (args[i] == "--wiki") {
             return startWikiMode();
@@ -34,34 +55,38 @@ int main(int argc, char *argv[]) {
 
     // initialize
     cout << "Starting..." << endl;
-    sb::initWindow();
-    sb::RenderShakebot *render = bot.getRender();
+
+    initWindow();
+    RenderShakebot *render = bot.getRender();
     render->scale(scale);
     render->move(offset);
 
-    sb::startSpeech();
+    startSpeech();
 
-    sb::Command::loadLanguage();
+    if (!Command::loadLanguage()) {
+        cerr << "Could not load voice commands" << endl;
+        return 1;
+    }
 
-    audio = sb::initAudio();
+    audio = initAudio();
     if (audio == NULL) {
         cerr << "Could not initialize audio client" << endl;
-        return 1;
+        return 2;
     }
 
     cout << "[running]" << endl;
 
-    sf::RenderWindow *window = sb::getWindow();
+    RenderWindow *window = getWindow();
     while (running) {
-        sb::pollInput();
+        pollInput();
         bot.update();
         render->draw(window);
-        sb::display();
+        display();
     }
 
     // shutdown
     cout << "Shutting down..." << endl;
-    sb::stopSpeech();
+    stopSpeech();
     cout << "Goodbye." << endl;
 
     return 0;
@@ -75,7 +100,7 @@ int startWikiMode() {
         getline(cin, query);
         cout << "Looking for " << query << endl;
         json result;
-        if (!sb::getWikiInfo(query, result)) {
+        if (!getWikiInfo(query, result)) {
             cerr << "Could not get results" << endl;
         } else {
             cout << result.dump(4) << endl;

@@ -1,3 +1,21 @@
+/*
+ * RPi-Shakebot
+ * ============
+ * A voice recognition bot built for Prof. James Eddy's Computer Organization
+ * (CS 121) class on the Raspberry Pi 3 Model B.
+ *
+ * References
+ * ~~~~~~~~~~
+ * [Festival]           : http://www.cstr.ed.ac.uk/projects/festival/manual/festival_28.html#SEC132
+ * [PortAudio]          : http://www.portaudio.com/
+ * [SFML]               : https://www.sfml-dev.org/
+ * [libcurl]            : https://curl.haxx.se/libcurl/c/
+ * [json]               : https://github.com/nlohmann/json
+ * [Google Speech API]  : https://cloud.google.com/speech/docs/
+ * [MediaWiki API]      : https://www.mediawiki.org/wiki/API:Main_page
+ *
+ * Copyright (C) Walker Crouse 2017 <wcrouse@uvm.edu>
+ */
 #include <cstdlib>
 #include "RestClient.h"
 
@@ -5,6 +23,7 @@ namespace sb {
 
     const string RestClient::DEFAULT_RESULT_TYPE = "application/json; charset=UTF-8";
 
+    /// libCURL callback
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp);
 
     RestClient::~RestClient() {
@@ -78,8 +97,10 @@ namespace sb {
         assert(curl != NULL);
         assert(!url.empty());
 
-        cout << "[============================================================ cURL ";
-        cout << "============================================================]" << endl;
+        if (verbose) {
+            cout << "[============================================================ cURL ";
+            cout << "============================================================]" << endl;
+        }
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());   // set request url
         curl_easy_setopt(curl, CURLOPT_POST, post);         // set request method
@@ -103,18 +124,12 @@ namespace sb {
             return NULL;
         }
 
-        cout << "[=====================================================================";
-        cout << "=========================================================]" << endl;
+        if (verbose) {
+            cout << "[=====================================================================";
+            cout << "=========================================================]" << endl;
+        }
 
         return &response;
-    }
-
-    json RestResponse::asJson() {
-        assert(data != NULL);
-        if (empty()) {
-            return json();
-        }
-        return json::parse(data);
     }
 
     RestResponse::RestResponse() {
@@ -135,6 +150,14 @@ namespace sb {
 
     bool RestResponse::empty() {
         return size == 0;
+    }
+
+    json RestResponse::asJson() {
+        assert(data != NULL);
+        if (empty()) {
+            return json();
+        }
+        return json::parse(data);
     }
 
     ostream& operator<<(ostream &out, const RestResponse &response) {
