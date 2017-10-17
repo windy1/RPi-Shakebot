@@ -76,7 +76,7 @@ namespace sb {
          *
          * @param phrase Phrase to say
          */
-        void say(string phrase);
+        void say(const string &phrase);
 
         /**
          * Updates the bot. To be called once every application cycle.
@@ -99,7 +99,7 @@ namespace sb {
      * @param phrase phrase to count syllables of
      * @return amount of syllables in the phrase
      */
-    int countSyllables(string phrase);
+    int countSyllables(const string &phrase);
 
 }
 

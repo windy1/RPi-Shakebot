@@ -58,7 +58,7 @@ namespace sb {
 
         json requestBody = SPEECH_REQUEST_BODY; /// json payload
 
-        SpeechRequest(const AudioData *data) {
+        explicit SpeechRequest(const AudioData *data) {
             // copy sample memory block to chars
             char *buffer = (char*) malloc(data->size());
             if (buffer == NULL) {

@@ -42,21 +42,21 @@ namespace sb {
 
     public:
 
-        RenderShakebot(Shakebot *bot, string textureFile, IntRect mouthRect);
+        RenderShakebot(Shakebot *bot, const string &textureFile, const IntRect &mouthRect);
 
         /**
          * Scales the render by the specified amount.
          *
          * @param scale Scale amount
          */
-        void scale(Vector2f scale);
+        void scale(const Vector2f &scale);
 
         /**
          * Moves the render by the specified offset.
          *
          * @param v offset amount
          */
-        void move(Vector2f v);
+        void move(const Vector2f &v);
 
         /**
          * Draws this component to the specified window.

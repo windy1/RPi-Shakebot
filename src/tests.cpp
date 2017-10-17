@@ -25,9 +25,9 @@
 
 namespace sb {
 
-    static bool recordFinished = false;
-    static AudioClient client;
-    static const AudioData *in = NULL;
+    static bool             recordFinished  = false;
+    static AudioClient      *client         = NULL;
+    static const AudioData  *in             = NULL;
 
     static void onRecordFinish();
 
@@ -120,20 +120,21 @@ namespace sb {
 
         cout << "Recording for default time..." << endl;
         int failed = 0;
-        if (!client.init()) {
+        client = new AudioClient();
+        if (!client->init()) {
             cerr << "Could not initialize client" << endl;
             failed++;
-        } else if (!client.setCaptureDevice(DEVICE_INDEX)) {
+        } else if (!client->setCaptureDevice(DEVICE_INDEX)) {
             cerr << "Could not initialize capture device" << endl;
             failed++;
         } else {
-            client.setCaptureCallback(onRecordFinish);
-            AudioDevice *device = client.getCaptureDevice();
+            client->setCaptureCallback(onRecordFinish);
+            AudioDevice *device = client->getCaptureDevice();
             device->params.channelCount = CHANNEL_COUNT_CAPTURE;
             device->params.sampleFormat = SAMPLE_FORMAT;
             device->bufferSize = BUFFER_SIZE_CAPTURE;
             cout << *device << endl;
-            if (!client.record(MAX_SECONDS)) {
+            if (!client->record(MAX_SECONDS)) {
                 cerr << "Failed to start recording" << endl;
                 failed++;
             }
@@ -141,21 +142,21 @@ namespace sb {
 
         while (!recordFinished);
 
-        if (!client.close()) {
+        if (!client->close()) {
             cerr << "Failed to close stream" << endl;
             failed++;
         }
 
-        if (!client.setPlaybackDevice(DEVICE_INDEX)) {
+        if (!client->setPlaybackDevice(DEVICE_INDEX)) {
             cerr << "Could not initialize playback device" << endl;
         }
 
-        AudioDevice *device = client.getPlaybackDevice();
+        AudioDevice *device = client->getPlaybackDevice();
         device->params.channelCount = CHANNEL_COUNT_PLAYBACK;
         device->params.sampleFormat = SAMPLE_FORMAT;
         device->bufferSize = BUFFER_SIZE_PLAYBACK;
         cout << *device << endl;
-        if (!client.play()) {
+        if (!client->play()) {
             cerr << "Failed to playback" << endl;
         }
 
@@ -170,7 +171,7 @@ namespace sb {
 
     void onRecordFinish() {
         cout << "- Finished recording" << endl;
-        in = client.data();
+        in = client->data();
         recordFinished = true;
     }
 

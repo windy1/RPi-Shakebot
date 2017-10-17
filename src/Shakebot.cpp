@@ -36,7 +36,7 @@ namespace sb {
         return &render;
     }
 
-    void Shakebot::say(string phrase) {
+    void Shakebot::say(const string &phrase) {
         cout << "Pushing phrase: " << phrase << endl;
         phraseBuffer = phrase;
     }
@@ -65,7 +65,7 @@ namespace sb {
                     }
                 }
                 // take next word from buffer
-                size_t wordBreak = phraseBuffer.find(" ");
+                size_t wordBreak = phraseBuffer.find(' ');
                 if (wordBreak != string::npos) {
                     currentWord = phraseBuffer.substr(0, wordBreak);
                     phraseBuffer = phraseBuffer.substr(wordBreak + 1);
@@ -131,16 +131,16 @@ namespace sb {
         in = data;
     }
 
-    int countSyllables(string phrase, unsigned int n) {
+    int countSyllables(const string &phrase, unsigned int n) {
         if (phrase.empty()) {
             return n;
         }
         string word = phrase;
-        unsigned long wordBreak = phrase.find(" ");
+        unsigned long wordBreak = phrase.find(' ');
         if (wordBreak != string::npos) {
             word = phrase.substr(0, wordBreak);
         }
-        unsigned int len = (unsigned int) word.size();
+        auto len = (unsigned int) word.size();
         if (word[len - 1] == 'e') {
             // remove trailing Es
             word = word.substr(0, len - 1);
@@ -155,7 +155,7 @@ namespace sb {
         return countSyllables(phrase.substr(wordBreak + 1), n + max((int) distance(begin, end), 1));
     }
 
-    int countSyllables(string phrase) {
+    int countSyllables(const string &phrase) {
         return countSyllables(phrase, 0);
     }
 

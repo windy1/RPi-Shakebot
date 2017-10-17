@@ -31,16 +31,16 @@ namespace sb {
     static vector<string> greetingResponses;
     static vector<string> wikiQualifiers;
 
-    static bool readLines(string fileName, vector<string> &buffer);
+    static bool readLines(const string &fileName, vector<string> &buffer);
 
     cmd_ptr Command::parse(string raw) {
-        for (string qualifier : wikiQualifiers) {
+        for (const string &qualifier : wikiQualifiers) {
             if (raw.substr(0, qualifier.size()) == qualifier) {
                 string subject = raw.substr(qualifier.size() + 1);
                 return make_shared<WikiCommand>(subject);
             }
         }
-        for (string qualifier : greetingQualifiers) {
+        for (const string &qualifier : greetingQualifiers) {
             if (raw.substr(0, qualifier.size()) == qualifier) {
                 // command is a greeting
                 return make_shared<GreetingCommand>();
@@ -62,7 +62,7 @@ namespace sb {
         return success;
     }
 
-    bool readLines(string fileName, vector<string> &buffer) {
+    bool readLines(const string &fileName, vector<string> &buffer) {
         cout << "- " << fileName << endl;
         ifstream file(fileName);
         if (!file) {

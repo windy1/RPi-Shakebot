@@ -21,7 +21,7 @@
 
 namespace sb {
 
-    RenderShakebot::RenderShakebot(Shakebot *bot, string textureFile, IntRect mRect) {
+    RenderShakebot::RenderShakebot(Shakebot *bot, const string &textureFile, const IntRect &mRect) {
         this->bot = bot;
         mouthRect = mRect;
         restingMouthPos = Vector2f(mRect.left, mRect.top);
@@ -37,7 +37,7 @@ namespace sb {
         mouthSprite.setPosition(restingMouthPos);
     }
 
-    void RenderShakebot::scale(Vector2f scale) {
+    void RenderShakebot::scale(const Vector2f &scale) {
         baseSprite.scale(scale);
         mouthSprite.scale(scale);
         mouthHole.scale(scale);
@@ -45,7 +45,7 @@ namespace sb {
         restingMouthPos = Vector2f(restingMouthPos.x * scale.x, restingMouthPos.y * scale.y);
     }
 
-    void RenderShakebot::move(Vector2f v) {
+    void RenderShakebot::move(const Vector2f &v) {
         baseSprite.move(v);
         mouthSprite.move(v);
         mouthHole.move(v);

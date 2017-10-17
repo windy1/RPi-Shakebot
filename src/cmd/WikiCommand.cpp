@@ -20,7 +20,7 @@
 
 namespace sb {
 
-    WikiCommand::WikiCommand(string subject) : subject(subject) {
+    WikiCommand::WikiCommand(const string &subject) : subject(subject) {
     }
 
     string WikiCommand::getType() const {

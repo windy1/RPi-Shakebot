@@ -29,11 +29,11 @@ namespace sb {
      */
     struct RestResponse {
 
-        CURLcode    code;           /// the response code returned by the server
-        size_t      size  = 0;      /// the size of the server's response
-        char        *data = NULL;   /// raw response data
+        CURLcode    code    = CURLE_OK; /// the response code returned by the server
+        size_t      size    = 0;        /// the size of the server's response
+        char        *data   = NULL;     /// raw response data
 
-        RestResponse();
+        RestResponse() = default;
 
         RestResponse(const RestResponse &response);
 
@@ -70,7 +70,7 @@ namespace sb {
         RestResponse    response;               /// object to read response into
 
         /// performs a new request
-        RestResponse* perform(string url, bool post, string resultType = DEFAULT_RESULT_TYPE);
+        RestResponse* perform(const string &url, bool post, const string &resultType = DEFAULT_RESULT_TYPE);
 
     public:
 
@@ -102,7 +102,7 @@ namespace sb {
          *
          * @param header Header to add
          */
-        void addHeader(string header);
+        void addHeader(const string &header);
 
         /**
          * Initializes this client and cURL.
@@ -119,7 +119,7 @@ namespace sb {
          * @param resultType Expected content type in response
          * @return A RestResponse if successful, NULL otherwise
          */
-        RestResponse* post(string data, string url, string resultType = DEFAULT_RESULT_TYPE);
+        RestResponse* post(const string &data, const string &url, const string &resultType = DEFAULT_RESULT_TYPE);
 
         /**
          * Performs a GET request.
@@ -128,7 +128,7 @@ namespace sb {
          * @param resultType Expected content type in response
          * @return A RestResponse if successful, NULL otherwise
          */
-        RestResponse* get(string url, string resultType = DEFAULT_RESULT_TYPE);
+        RestResponse* get(const string &url, const string &resultType = DEFAULT_RESULT_TYPE);
 
     };
 

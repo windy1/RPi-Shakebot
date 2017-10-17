@@ -30,9 +30,6 @@ namespace sb {
 
     /* -- AudioData -- */
 
-    AudioData::AudioData() {
-    }
-
     AudioData::AudioData(const AudioData &data) {
         frameIndex = data.frameIndex;
         frameCount = data.frameCount;

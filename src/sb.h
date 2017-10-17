@@ -80,16 +80,16 @@ namespace sb {
      * @param result Wikipedia results
      * @return True if successful
      */
-    bool getWikiInfo(string subject, json &result);
+    bool getWikiInfo(const string &subject, json &result);
 
     /**
      * A utility class for non-assignable types. (i.e. RestClient, AudioClient)
      */
     class NonAssignable {
-        NonAssignable(const NonAssignable&) = delete;
-        NonAssignable operator=(const NonAssignable&) = delete;
     public:
-        NonAssignable() {}
+        NonAssignable(const NonAssignable&) = delete;
+        NonAssignable() = default;
+        NonAssignable operator=(const NonAssignable&) = delete;
     };
 
 }

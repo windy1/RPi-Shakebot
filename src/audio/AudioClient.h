@@ -101,7 +101,7 @@ namespace sb {
          *
          * @param captureCallback Callback function
          */
-        void setCaptureCallback(CaptureCallback captureCallback);
+        void setCaptureCallback(const CaptureCallback &captureCallback);
 
         /**
          * Returns true if this client currently has a stream active.

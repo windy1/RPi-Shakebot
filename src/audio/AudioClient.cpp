@@ -76,7 +76,7 @@ namespace sb {
         in = (const Sample*) inputBuffer;
         sampleData = &data->recordedSamples[data->frameIndex * CHANNEL_COUNT_CAPTURE];
 
-        unsigned long framesLeft = (unsigned long) (data->frameCount - data->frameIndex);
+        auto framesLeft = (unsigned long) (data->frameCount - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             // write the rest of the frames
             frames = framesLeft;
@@ -119,7 +119,7 @@ namespace sb {
 
         AudioData   *data;                          // the sample data we are reading from
         Sample      *sampleData;                    // the slice of samples we will write this period
-        Sample      *out = (Sample*) outputBuffer;  // the space to write sample to output device
+        auto        *out = (Sample*) outputBuffer;  // the space to write sample to output device
         int         state;                          // the completion state of the stream
 
         data = (AudioData*) userData;
@@ -128,7 +128,7 @@ namespace sb {
         // Note: The following has been hardcoded to write 1-channel input
         // (mono) to 2-channel output (stereo).
 
-        unsigned int framesLeft = (unsigned int) (data->frameCount - data->frameIndex);
+        auto framesLeft = (unsigned int) (data->frameCount - data->frameIndex);
         if (framesLeft < framesPerBuffer) {
             int i = 0;
             for (i = 0; i < framesLeft; i++) {
@@ -245,7 +245,7 @@ namespace sb {
         }
 
         // initialize capture device
-        PaStreamParameters params;
+        PaStreamParameters params = {};
         if (index == -1) {
             params.device = Pa_GetDefaultInputDevice();
         } else {
@@ -278,7 +278,7 @@ namespace sb {
         return captureCallback;
     }
 
-    void AudioClient::setCaptureCallback(CaptureCallback captureCallback) {
+    void AudioClient::setCaptureCallback(const CaptureCallback &captureCallback) {
         this->captureCallback = captureCallback;
     }
 
@@ -396,7 +396,7 @@ namespace sb {
             return false;
         }
 
-        PaStreamParameters params;
+        PaStreamParameters params = {};
         if (index == -1) {
             params.device = Pa_GetDefaultOutputDevice();
         } else {

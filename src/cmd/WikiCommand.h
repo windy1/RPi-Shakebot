@@ -31,11 +31,11 @@ namespace sb {
 
         static const int MAX_RESULT_SIZE = 200;
 
-        WikiCommand(string subject);
+        explicit WikiCommand(const string &subject);
 
-        virtual string getType() const override;
+        string getType() const override;
 
-        virtual string execute() override;
+        string execute() override;
 
     };
 

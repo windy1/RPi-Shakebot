@@ -45,7 +45,7 @@ namespace sb {
         this->verbose = verbose;
     }
 
-    void RestClient::addHeader(string header) {
+    void RestClient::addHeader(const string &header) {
         assert(!header.empty());
         requestHeaders = curl_slist_append(requestHeaders, header.c_str());
     }
@@ -83,17 +83,17 @@ namespace sb {
         return true;
     }
 
-    RestResponse* RestClient::post(string data, string url, string resultType) {
+    RestResponse* RestClient::post(const string &data, const string &url, const string &resultType) {
         assert(curl != NULL);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str()); // set post data
         return perform(url, true, resultType);
     }
 
-    RestResponse* RestClient::get(string url, string resultType) {
+    RestResponse* RestClient::get(const string &url, const string &resultType) {
         return perform(url, false, resultType);
     }
 
-    RestResponse* RestClient::perform(string url, bool post, string resultType) {
+    RestResponse* RestClient::perform(const string &url, bool post, const string &resultType) {
         assert(curl != NULL);
         assert(!url.empty());
 
@@ -132,9 +132,6 @@ namespace sb {
         return &response;
     }
 
-    RestResponse::RestResponse() {
-    }
-
     RestResponse::RestResponse(const RestResponse &response) {
         code = response.code;
         size = response.size;
@@ -168,7 +165,7 @@ namespace sb {
     static size_t writeResponse(void *contents, size_t size, size_t nmemb, void *userp) {
         // reallocate data block while reading
         size_t realSize = size * nmemb;
-        RestResponse *response = (RestResponse*) userp;
+        auto *response = (RestResponse*) userp;
         response->data = (char*) realloc(response->data, response->size + realSize + 1);
         if(response->data == NULL) {
             cerr << "Error: Could not reallocate response buffer" << endl;

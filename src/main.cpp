@@ -23,19 +23,30 @@
 
 using namespace sb;
 
-static Shakebot     bot;
+static const Vector2f DEFAULT_SCALE (1, 1);
+static const Vector2f DEFAULT_OFFSET(0, 0);
+
+static const int ERR_LOAD_LANG  = 1;
+static const int ERR_INIT_AUDIO = 2;
+
+static Shakebot     *bot    = NULL;
 static AudioClient  *audio  = NULL;
 static bool         running = true;
 
+/**
+ * Starts the program in "wiki" mode where you can look up wikipedia articles.
+ *
+ * @return exit code
+ */
 static int startWikiMode();
 
 int main(int argc, char *argv[]) {
-    srand((unsigned) time(NULL));
+    srand((unsigned) time(0)); // TODO: replace with better random
 
-    // parse arguments
+    // parse program arguments
     vector<string> args(argv, argv + argc);
-    Vector2f scale(1, 1);
-    Vector2f offset(0, 0);
+    Vector2f scale = DEFAULT_SCALE;
+    Vector2f offset = DEFAULT_OFFSET;
     for (int i = 0; i < args.size(); i++) {
         if (args[i] == "--test") {
             return runTests();
@@ -56,8 +67,11 @@ int main(int argc, char *argv[]) {
     // initialize
     cout << "Starting..." << endl;
 
+    // initialize bot
+    bot = new Shakebot();
+
     initWindow();
-    RenderShakebot *render = bot.getRender();
+    RenderShakebot *render = bot->getRender();
     render->scale(scale);
     render->move(offset);
 
@@ -65,21 +79,22 @@ int main(int argc, char *argv[]) {
 
     if (!Command::loadLanguage()) {
         cerr << "Could not load voice commands" << endl;
-        return 1;
+        return ERR_LOAD_LANG;
     }
 
     audio = initAudio();
     if (audio == NULL) {
         cerr << "Could not initialize audio client" << endl;
-        return 2;
+        return ERR_INIT_AUDIO;
     }
 
     cout << "[running]" << endl;
 
+    // main loop
     RenderWindow *window = getWindow();
     while (running) {
         pollInput();
-        bot.update();
+        bot->update();
         render->draw(window);
         display();
     }
@@ -112,7 +127,7 @@ int startWikiMode() {
 namespace sb {
 
     Shakebot* getBot() {
-        return &bot;
+        return bot;
     }
 
     AudioClient* getAudioClient() {
@@ -155,7 +170,7 @@ namespace sb {
         return true;
     }
 
-    bool getWikiInfo(string subject, json &result) {
+    bool getWikiInfo(const string &subject, json &result) {
         // initialize client
         RestClient client;
         client.addHeader(HEADER_ACCEPT_JSON);

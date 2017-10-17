@@ -37,7 +37,7 @@
 #define ENCODING                "LINEAR16"  /// the encoding id for voice api
 #define LANGUAGE_CODE           "en-US"     /// language being recorded
 #ifdef __APPLE__                            ///
-#define DEVICE_INDEX            -1          /// macOS -> use default device
+#define DEVICE_INDEX            (-1)        /// macOS -> use default device
 #else                                       ///
 #define DEVICE_INDEX             2          /// RPi -> use hardcoded device
 #endif
@@ -57,13 +57,13 @@ namespace sb {
      */
     struct AudioData {
 
-        int         frameIndex;                     /// incremented iterating sample data
-        int         frameCount;                     /// the total amount of frames in the recording
-        int         captureChannels;                /// the amount of channels the data was sampled with
+        int         frameIndex          = 0;        /// incremented iterating sample data
+        int         frameCount          = 0;        /// the total amount of frames in the recording
+        int         captureChannels     = 0;        /// the amount of channels the data was sampled with
         Sample      *recordedSamples    = NULL;     /// block of memory containing samples
         AudioClient *client             = NULL;     /// reference to client
 
-        AudioData();
+        AudioData() = default;
 
         AudioData(const AudioData &data);
 
@@ -90,9 +90,9 @@ namespace sb {
      */
     struct AudioDevice {
 
-        PaStreamParameters  params;                     /// PA parameters
-        unsigned long       bufferSize = 0;             /// amount of samples to process per period
-        int                 sampleRate = SAMPLE_RATE;   /// sample rates in Hz
+        PaStreamParameters  params      = {};           /// PA parameters
+        unsigned long       bufferSize  = 0;            /// amount of samples to process per period
+        int                 sampleRate  = SAMPLE_RATE;  /// sample rates in Hz
 
         friend ostream &operator<<(ostream &out, const AudioDevice &device);
 

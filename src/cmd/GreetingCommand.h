@@ -26,9 +26,9 @@ namespace sb {
     class GreetingCommand : public Command {
     public:
 
-        virtual string getType() const override;
+        string getType() const override;
 
-        virtual string execute() override;
+        string execute() override;
 
     };
 
